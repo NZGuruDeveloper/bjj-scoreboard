@@ -1,6 +1,6 @@
 "use client";
-import Image from "next/image";
-import Clock from "react-live-clock";
+//import Image from "next/image";
+//import Clock from "react-live-clock";
 import React, {
   useState,
   useEffect,
@@ -10,7 +10,6 @@ import React, {
   useRef,
 } from "react";
 
-import ReactDOM from "react-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faCrown } from "@fortawesome/free-solid-svg-icons";
@@ -240,21 +239,19 @@ export const reducer = (state, action) => {
         isRunning: (state.isRunning = false),
         matchEnded: (state.matchEnded = true),
       };
-      case "RESULT_DRAW":
-        return {
-          ...state,
-          winner: (state.winner = "Draw"),
-          isRunning: (state.isRunning = false),
-          matchEnded: (state.matchEnded = true),
-        };
+    case "RESULT_DRAW":
+      return {
+        ...state,
+        winner: (state.winner = "Draw"),
+        isRunning: (state.isRunning = false),
+        matchEnded: (state.matchEnded = true),
+      };
 
     // Reset Actions
     case "RESET":
-      return { ...initialState,
-        isMatchReset: (state.isMatchReset = true),
-       }; // Reset to initialState;
-       case "RESET_STATE":
-        return initialState;
+      return { ...initialState, isMatchReset: (state.isMatchReset = true) }; // Reset to initialState;
+    case "RESET_STATE":
+      return initialState;
     default:
       return state;
   }
@@ -273,15 +270,23 @@ export const CountdownProvider = ({ children }) => {
 export default function Home() {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [isOpen, setIsOpen] = useState(false);
+  //const [settings, setSettings] = useState(false);
 
   const setTime = (newTime) => {
     dispatch({ type: "RESET" }); // Reset timer before setting new time
     dispatch({ type: "SET_COUNTDOWN_TIME", payload: newTime }); // Dispatch new time action
+    console.log("setting new time!");
+    console.log(state);
+  };
+
+  const handleSettingsClose = () => {
+    setIsOpen(false);
+    console.log(isOpen);
   };
 
   return (
     <CountdownProvider>
-      <main className="flex items-center justify-center p-4 text-slate-200">
+      <main className="flex flex-col items-center justify-center p-4 text-slate-200">
         <div className="bg-slate-9500 p-4 w-70 font-san font-normal text-5xl lg:text-15xl antialiased">
           <div>
             <Timer />
@@ -297,7 +302,7 @@ export default function Home() {
             <div className="flex items-start justify-center w-full">
               <div
                 className="bg-[#8CE5BA] w-50 h-35 p-2 text-2xl flex rounded m-4 text-slate-950"
-                onClick={() => setSettings(true)}
+                onClick={() => setIsOpen(true)}
               >
                 <FontAwesomeIcon className="fa-2xl" icon={faSliders} />{" "}
                 <button className="ml-2 mt-1" onClick={() => setIsOpen(true)}>
@@ -306,8 +311,8 @@ export default function Home() {
                 {isOpen && (
                   <SettingsDialog
                     isOpen={isOpen}
-                    onClose={() => setIsOpen(false)}
-                    onSetTime={setTime}
+                    onClose={() => handleSettingsClose()}
+                    onSetTime={() => setTime}
                   />
                 )}
                 {/* Settings TODO: control timer, with default 5min control players background
@@ -319,6 +324,25 @@ export default function Home() {
               </p>
             </div>
           </div>
+        </div>
+        <div>
+          <p className="italic underline decoration-sky-500">
+           &copy; This is work in progress, and has a few bugs to sort out still
+            before it can be fully usable.
+          </p>
+
+            
+            <ul className="list-disc">
+            <p className="font-bold">TODO:</p>
+              <li>Fix Settings Dialogue</li>
+              <li>Fix the Reset button actions</li>
+              <li>Add sounds to: start, end match, timer finished.</li>
+              <li>
+                Add ability to change the second Competitor score background to
+                match with band used.
+              </li>
+            </ul>
+          
         </div>
       </main>
     </CountdownProvider>
@@ -335,7 +359,7 @@ export function Timer(props) {
 
   const minutes = String(state.minutes).padStart(1, "0");
   const seconds = String(state.seconds).padStart(2, "0");
- 
+
   /**
    * Handles the start/pause button click. If the match hasn't started, starts the match.
    * If the match is running, pauses it. If the match is paused, unpauses it.
@@ -352,7 +376,7 @@ export function Timer(props) {
       dispatch({ type: "MATCH_UNPAUSED" });
     }
   };
-  
+
   let intervalId = null;
   useEffect(() => {
     if (intervalId) {
@@ -374,7 +398,6 @@ export function Timer(props) {
       !state.isPaused &&
       state.matchStarted &&
       !state.matchEnded
-
     ) {
       intervalId = setInterval(() => {
         //dispatch({ type: "DECREMENT" });
@@ -387,7 +410,7 @@ export function Timer(props) {
       }
     }
 
-   if (
+    if (
       state.matchStarted &&
       state.isRunning &&
       state.isPaused &&
@@ -405,13 +428,18 @@ export function Timer(props) {
     ) {
       dispatch({ type: "MATCH_UNPAUSED" });
       console.log("match unpaused");
-    } else if (state.matchEnded && state.matchStarted && state.isRunning && !state.isPaused ) {
+    } else if (
+      state.matchEnded &&
+      state.matchStarted &&
+      state.isRunning &&
+      !state.isPaused
+    ) {
       // match ended and tally winner
       console.log("match ended");
       if (intervalId) {
-      clearInterval(intervalId);
-      intervalId = null;
-      dispatch({ type: "MATCH_ENDED" });
+        clearInterval(intervalId);
+        intervalId = null;
+        dispatch({ type: "MATCH_ENDED" });
       }
     }
     // Stop at 0:00 and clear the interval
@@ -436,7 +464,7 @@ export function Timer(props) {
     if (state.matchEnded && state.minutes <= 0 && state.seconds <= 0) {
       clearInterval(intervalId);
       intervalId = null;
-      console.log('Timer Expired! Tallying Scores...');
+      console.log("Timer Expired! Tallying Scores...");
       if (state.playerOneScore > state.playerTwoScore) {
         dispatch({ type: "PLAYER_ONE_WINS" });
       } else if (state.playerTwoScore > state.playerOneScore) {
@@ -456,13 +484,17 @@ export function Timer(props) {
           state.playerOneAdvantageScore > state.playerTwoAdvantageScore
         ) {
           dispatch({ type: "PLAYER_ONE_WINS" });
-        } else if (state.playerOneScore === state.playerTwoScore && state.playerOneAdvantageScore === state.playerTwoAdvantageScore && state.playerOnePenaltyScore === state.playerTwoPenaltyScore) {
+        } else if (
+          state.playerOneScore === state.playerTwoScore &&
+          state.playerOneAdvantageScore === state.playerTwoAdvantageScore &&
+          state.playerOnePenaltyScore === state.playerTwoPenaltyScore
+        ) {
           clearSessionInterval();
           dispatch({ type: "RESULT_DRAW" });
         }
       }
       return () => clearInterval(intervalId);
-    } 
+    }
 
     // Cleanup function to clear the interval when the component unmounts
     return () => {
@@ -509,12 +541,13 @@ export function DeclareWinner() {
           <p>Competitor {state.winner} Wins!</p>
           <FontAwesomeIcon className="fa-2xl ml-4" icon={faCrown} />{" "}
         </div>
-      ) : state.winner === "Draw" ? ( 
+      ) : state.winner === "Draw" ? (
         <div className="flex items-center justify-center font-bold uppercase text-xl px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150">
           <p>Its a DRAW!</p>
         </div>
-       ) : ""}
-      
+      ) : (
+        ""
+      )}
     </div>
   );
 }
@@ -858,12 +891,19 @@ export function PlayerTwo() {
 }
 
 export const SettingsDialog = ({ isOpen, onClose, onSetTime }) => {
+  const { state, dispatch } = useContext(CountdownContext);
   const [minutes, setMinutes] = useState(5);
   const [seconds, setSeconds] = useState(0);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     onSetTime({ minutes, seconds });
+    //dispatch({type: "SET_COUNTDOWN_TIME"});
+    console.log(state);
+    onClose();
+  };
+
+  const handleClose = () => {
     onClose();
   };
 
@@ -891,7 +931,7 @@ export const SettingsDialog = ({ isOpen, onClose, onSetTime }) => {
         </div>
         <button type="submit">Set</button>
       </form>
-      <button onClick={onClose}>Close</button>
+      <button onClick={handleClose}>Close</button>
     </div>
   );
 };
