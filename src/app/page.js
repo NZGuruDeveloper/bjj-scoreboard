@@ -330,8 +330,6 @@ export default function Home() {
            &copy; This is work in progress, and has a few bugs to sort out still
             before it can be fully usable.
           </p>
-
-            
             <ul className="list-disc">
             <p className="font-bold">TODO:</p>
               <li>Fix Settings Dialogue</li>
@@ -537,12 +535,12 @@ export function DeclareWinner() {
   return (
     <div>
       {state.winner === "One" || state.winner === "Two" ? (
-        <div className="flex items-center justify-center font-bold uppercase text-xl px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150">
-          <p>Competitor {state.winner} Wins!</p>
+        <div className="flex items-center justify-center font-bold uppercase text-xl px-6 py-3 rounded shadow-[inset_0_-2px_15px_#cbd5e1]">
+          <p className="">Competitor {state.winner} Wins!</p>
           <FontAwesomeIcon className="fa-2xl ml-4" icon={faCrown} />{" "}
         </div>
       ) : state.winner === "Draw" ? (
-        <div className="flex items-center justify-center font-bold uppercase text-xl px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150">
+        <div className="flex items-center justify-center font-bold uppercase text-xl px-6 py-3 rounded shadow-[inset_0_-2px_15px_#cbd5e1]">
           <p>Its a DRAW!</p>
         </div>
       ) : (
