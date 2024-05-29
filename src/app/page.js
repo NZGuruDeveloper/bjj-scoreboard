@@ -483,8 +483,10 @@ export function Timer(props) {
       } else if (state.playerTwoScore > state.playerOneScore) {
         dispatch({ type: "PLAYER_TWO_WINS" });
       } else if (state.playerOneScore === state.playerTwoScore) {
+        console.log("Advantage Tallying...");
         if (state.playerTwoAdvantageScore > state.playerOneAdvantageScore) {
           if (state.playerOnePenaltyScore < state.playerTwoPenaltyScore) {
+            console.log("Penalty Tallying...");
             dispatch({ type: "PLAYER_ONE_WINS" });
           } else if (
             state.playerTwoPenaltyScore < state.playerOnePenaltyScore
@@ -497,7 +499,16 @@ export function Timer(props) {
           state.playerOneAdvantageScore > state.playerTwoAdvantageScore
         ) {
           dispatch({ type: "PLAYER_ONE_WINS" });
-        } else if (
+        } else if ( state.playerOneAdvantageScore === state.playerTwoAdvantageScore){
+          if (state.playerOnePenaltyScore < state.playerTwoPenaltyScore) {
+            console.log("Penalty Tallying...");
+            dispatch({ type: "PLAYER_ONE_WINS" });
+          } else if (
+            state.playerTwoPenaltyScore < state.playerOnePenaltyScore
+          ) {
+            dispatch({ type: "PLAYER_TWO_WINS" });
+          } 
+       } else if (
           state.playerOneScore === state.playerTwoScore &&
           state.playerOneAdvantageScore === state.playerTwoAdvantageScore &&
           state.playerOnePenaltyScore === state.playerTwoPenaltyScore
