@@ -36,6 +36,7 @@ const initialState = {
   isPaused: false,
   winner: null,
   isMatchReset: false,
+  intervalId: null,
 };
 
 export const reducer = (state, action) => {
@@ -46,8 +47,8 @@ export const reducer = (state, action) => {
         matchStarted: (state.matchStarted = true),
         isRunning: (state.isRunning = true),
         isPaused: (state.isPaused = false),
-        seconds: state.seconds === 0 ? 59 : state.seconds - 1,
-        minutes: state.seconds === 0 ? state.minutes - 1 : state.minutes,
+        seconds: state.seconds <= 0 ? 59 : state.seconds - 1,
+        minutes: state.seconds <= 0 ? state.minutes - 1 : state.minutes,
       };
     case "SET_COUNTDOWN_TIME":
       return {
@@ -229,22 +230,22 @@ export const reducer = (state, action) => {
       return {
         ...state,
         winner: (state.winner = "One"),
-        isRunning: (state.isRunning = false),
-        matchEnded: (state.matchEnded = true),
+        //isRunning: (state.isRunning = false),
+       // matchEnded: (state.matchEnded = true),
       };
     case "PLAYER_TWO_WINS":
       return {
         ...state,
         winner: (state.winner = "Two"),
-        isRunning: (state.isRunning = false),
-        matchEnded: (state.matchEnded = true),
+        //isRunning: (state.isRunning = false),
+       // matchEnded: (state.matchEnded = true),
       };
     case "RESULT_DRAW":
       return {
         ...state,
         winner: (state.winner = "Draw"),
-        isRunning: (state.isRunning = false),
-        matchEnded: (state.matchEnded = true),
+        //isRunning: (state.isRunning = false),
+        //matchEnded: (state.matchEnded = true),
       };
 
     // Reset Actions
@@ -327,20 +328,19 @@ export default function Home() {
         </div>
         <div>
           <p className="italic underline decoration-sky-500">
-           &copy; This is work in progress, and has a few bugs to sort out still
-            before it can be fully usable.
+            &copy; This is work in progress, and has a few bugs to sort out
+            still before it can be fully usable.
           </p>
-            <ul className="list-disc">
+          <ul className="list-disc">
             <p className="font-bold">TODO:</p>
-              <li>Fix Settings Dialogue</li>
-              <li>Fix the Reset button actions</li>
-              <li>Add sounds to: start, end match, timer finished.</li>
-              <li>
-                Add ability to change the second Competitor score background to
-                match with band used.
-              </li>
-            </ul>
-          
+            <li>Fix Settings Dialogue</li>
+            <li>Fix the Reset button actions</li>
+            <li>Add sounds to: start, end match, timer finished.</li>
+            <li>
+              Add ability to change the second Competitor score background to
+              match with band used.
+            </li>
+          </ul>
         </div>
       </main>
     </CountdownProvider>
@@ -375,93 +375,108 @@ export function Timer(props) {
     }
   };
 
-  let intervalId = null;
-  useEffect(() => {
-    if (intervalId) {
-      clearSessionInterval();
-    } else {
-      let intervalId = null;
-    }
-    if (state.isMatchReset) {
-      dispatch({ type: "RESET" });
-      return;
-    }
-    const clearSessionInterval = () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-    };
-    if (
-      state.isRunning &&
-      !state.isPaused &&
-      state.matchStarted &&
-      !state.matchEnded
-    ) {
-      intervalId = setInterval(() => {
-        //dispatch({ type: "DECREMENT" });
-        dispatch({ type: "MATCH_STARTED" });
-      }, 1000);
-    } else {
-      // Cleanup function to clear the interval when the component unmounts
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-    }
+  
+    useEffect(() => {
+      if (!state.matchEnded) {
+      const createInterval = () => {
+        state.intervalId = setInterval(() => {
+          //dispatch({ type: "DECREMENT" });
+          dispatch({ type: "MATCH_STARTED" });
+        }, 1000);
+      };
+      const clearSessionInterval = () => {
+        if (state.intervalId) {
+          clearInterval(state.intervalId);
+          state.intervalId = null;
+        }
+      };
 
-    if (
-      state.matchStarted &&
-      state.isRunning &&
-      state.isPaused &&
-      !state.matchEnded
-    ) {
-      setTimeout(() => {
-        dispatch({ type: "MATCH_PAUSED" });
-      });
-      console.log("match paused");
-    } else if (
-      state.isPaused &&
-      !state.matchEnded &&
-      !state.matchStarted &&
-      state.isRunning
-    ) {
-      dispatch({ type: "MATCH_UNPAUSED" });
-      console.log("match unpaused");
-    } else if (
-      state.matchEnded &&
-      state.matchStarted &&
-      state.isRunning &&
-      !state.isPaused
-    ) {
-      // match ended and tally winner
-      console.log("match ended");
-      if (intervalId) {
-        clearInterval(intervalId);
-        intervalId = null;
+      createInterval();
+      if (state.isMatchReset) {
+        dispatch({ type: "RESET" });
+        clearSessionInterval();
+      }
+
+      if (
+        state.isRunning &&
+        !state.isPaused &&
+        state.matchStarted &&
+        !state.matchEnded
+      ) {
+      } else {
+        // Cleanup function to clear the interval when the component unmounts
+        if (state.intervalId) {
+          clearInterval(state.intervalId);
+        }
+      }
+
+      if (
+        state.matchStarted &&
+        state.isRunning &&
+        state.isPaused &&
+        !state.matchEnded
+      ) {
+        setTimeout(() => {
+          dispatch({ type: "MATCH_PAUSED" });
+        });
+        console.log("match paused");
+      } else if (
+        state.isPaused &&
+        !state.matchEnded &&
+        !state.matchStarted &&
+        state.isRunning
+      ) {
+        dispatch({ type: "MATCH_UNPAUSED" });
+        console.log("match unpaused");
+      } else if (
+        state.matchEnded &&
+        state.matchStarted &&
+        state.isRunning &&
+        !state.isPaused
+      ) {
+        // match ended and tally winner
+        console.log("match ended");
+        if (state.intervalId) {
+          clearInterval(state.intervalId);
+          state.intervalId = null;
+          dispatch({ type: "MATCH_ENDED" });
+        }
+      }
+      // Stop at 0:00 and clear the interval
+      if (state.minutes <= 0 && state.seconds <= 0) {
+        clearInterval(state.intervalId);
+        state.intervalId = null;
         dispatch({ type: "MATCH_ENDED" });
       }
-    }
-    // Stop at 0:00 and clear the interval
-    if (state.minutes <= 0 && state.seconds <= 0) {
-      clearInterval(intervalId);
-      intervalId = null;
-      dispatch({ type: "MATCH_ENDED" });
-    }
 
-    if (state.winner === "One" || state.winner === "Two") {
-      //console.log("Winner declared!");
-      clearInterval(intervalId);
-      intervalId = null;
-      if (state.winner === "One" && state.matchEnded) {
-        dispatch({ type: "PLAYER_ONE_WINS" });
-      } else if (state.winner === "Two" && state.matchEnded) {
-        dispatch({ type: "PLAYER_TWO_WINS" });
+      if (state.winner === "One" || state.winner === "Two") {
+        //console.log("Winner declared!");
+        clearInterval(state.intervalId);
+        state.intervalId = null;
+        if (state.winner === "One" && state.matchEnded) {
+          dispatch({ type: "PLAYER_ONE_WINS" });
+        } else if (state.winner === "Two" && state.matchEnded) {
+          dispatch({ type: "PLAYER_TWO_WINS" });
+        }
       }
+    
+      // Cleanup function to clear the interval when the component unmounts
+      return () => {
+        console.log("cleanup");
+        clearSessionInterval();
+      };
     }
+    }, [
+      //setInterval,
+      //createInterval,
+      dispatch,
+      state,
+    ]);
 
-    // Handle timer expire and tally of scores
-    if (state.matchEnded && state.minutes <= 0 && state.seconds <= 0) {
-      clearInterval(intervalId);
-      intervalId = null;
+  useEffect(() => {
+    if (state.matchEnded && state.minutes <= 0 && state.seconds <= 0 && state.winner === null) {
+      // Handle timer expire and tally of scores
+      //clearSessionInterval();
       console.log("Timer Expired! Tallying Scores...");
       if (state.playerOneScore > state.playerTwoScore) {
         dispatch({ type: "PLAYER_ONE_WINS" });
@@ -487,32 +502,12 @@ export function Timer(props) {
           state.playerOneAdvantageScore === state.playerTwoAdvantageScore &&
           state.playerOnePenaltyScore === state.playerTwoPenaltyScore
         ) {
-          clearSessionInterval();
+          //clearSessionInterval();
           dispatch({ type: "RESULT_DRAW" });
         }
       }
-      return () => clearInterval(intervalId);
     }
-
-    // Cleanup function to clear the interval when the component unmounts
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-    };
-  }, [
-    setInterval,
-    dispatch,
-    state,
-    state.minutes,
-    state.seconds,
-    state.isRunning,
-    state.isPaused,
-    state.matchStarted,
-    state.winner,
-    state.matchEnded,
-    state.isMatchReset,
-  ]);
+  }, [state, dispatch]);
 
   return (
     <div
@@ -549,57 +544,6 @@ export function DeclareWinner() {
     </div>
   );
 }
-/* export const TimerControls = () => {
-  const { state, dispatch } = useContext(CountdownContext);
-  const [isPaused, setIsPaused] = useState(true); // Initially paused
-  const [shouldStart, setShouldStart] = useState(false); // Flag to control start
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      if (shouldStart && !isPaused) {
-        dispatch({ type: "DECREMENT" });
-      }
-    }, 1000);
-
-    // Cleanup function to clear the interval when the component unmounts
-    return () => clearInterval(intervalId);
-  }, [dispatch, isPaused, shouldStart]);
-
-  const handleStartPause = () => {
-    setIsPaused(!isPaused);
-    if (!shouldStart) {
-      // Start timer on first click only
-      setShouldStart(true);
-    }
-  };
-
-  return (
-    <div>
-      <div className="bg-[#8CE5BA] w-50 h-35 p-2 text-2xl flex rounded m-4 text-slate-950">
-        <button onClick={handleStartPause} disabled={!shouldStart}>
-          {state.minutes === 0 && state.seconds === 0
-            ? "Start"
-            : isPaused
-            ? "Resume"
-            : "Pause"}
-        </button>
-      </div>
-      <div
-        className="bg-[#8CE5BA] w-50 h-35 p-2 text-2xl flex rounded m-4 text-slate-950"
-        onClick={() => dispatch({ type: "RESET" })}
-      >
-        <FontAwesomeIcon className="fa-2xl" icon={faArrowsRotate} />{" "}
-        <button
-          className="ml-2 mt-1"
-          onClick={() => dispatch({ type: "RESET" })}
-        >
-          Reset
-        </button>
-  
-      </div>
-    </div>
-  );
-}; */
 
 /**
  * Renders the score component for Player One.
