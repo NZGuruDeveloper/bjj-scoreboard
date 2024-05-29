@@ -224,6 +224,7 @@ export const reducer = (state, action) => {
         ...state,
         isRunning: (state.isRunning = false),
         matchEnded: (state.matchEnded = true),
+        matchStarted: (state.matchStarted = false),
       };
 
     case "PLAYER_ONE_WINS":
@@ -231,14 +232,14 @@ export const reducer = (state, action) => {
         ...state,
         winner: (state.winner = "One"),
         //isRunning: (state.isRunning = false),
-       // matchEnded: (state.matchEnded = true),
+        // matchEnded: (state.matchEnded = true),
       };
     case "PLAYER_TWO_WINS":
       return {
         ...state,
         winner: (state.winner = "Two"),
         //isRunning: (state.isRunning = false),
-       // matchEnded: (state.matchEnded = true),
+        // matchEnded: (state.matchEnded = true),
       };
     case "RESULT_DRAW":
       return {
@@ -249,8 +250,6 @@ export const reducer = (state, action) => {
       };
 
     // Reset Actions
-    case "RESET":
-      return { ...initialState, isMatchReset: (state.isMatchReset = true) }; // Reset to initialState;
     case "RESET_STATE":
       return initialState;
     default:
@@ -311,7 +310,7 @@ export default function Home() {
                 </button>
                 {isOpen && (
                   <SettingsDialog
-                    isOpen={isOpen}
+                    //isOpen={isOpen}
                     onClose={() => handleSettingsClose()}
                     onSetTime={() => setTime}
                   />
@@ -363,7 +362,7 @@ export function Timer(props) {
    * If the match is running, pauses it. If the match is paused, unpauses it.
    */
   const handleStartPause = () => {
-    if (!state.isRunning && !state.isPaused && !state.matchStarted) {
+    if (!state.matchStarted) {
       // Start the match if it hasn't started
       dispatch({ type: "MATCH_STARTED" });
     } else if (state.isRunning && !state.isPaused && state.matchStarted) {
@@ -375,12 +374,10 @@ export function Timer(props) {
     }
   };
 
-  
-    useEffect(() => {
-      if (!state.matchEnded) {
+  useEffect(() => {
+    if (!state.matchEnded || state.matchStarted) {
       const createInterval = () => {
         state.intervalId = setInterval(() => {
-          //dispatch({ type: "DECREMENT" });
           dispatch({ type: "MATCH_STARTED" });
         }, 1000);
       };
@@ -392,11 +389,6 @@ export function Timer(props) {
       };
 
       createInterval();
-      if (state.isMatchReset) {
-        dispatch({ type: "RESET" });
-        clearSessionInterval();
-      }
-
       if (
         state.isRunning &&
         !state.isPaused &&
@@ -437,44 +429,46 @@ export function Timer(props) {
         // match ended and tally winner
         console.log("match ended");
         if (state.intervalId) {
-          clearInterval(state.intervalId);
-          state.intervalId = null;
+          clearSessionInterval();
           dispatch({ type: "MATCH_ENDED" });
         }
       }
       // Stop at 0:00 and clear the interval
       if (state.minutes <= 0 && state.seconds <= 0) {
-        clearInterval(state.intervalId);
-        state.intervalId = null;
+        clearSessionInterval();
         dispatch({ type: "MATCH_ENDED" });
       }
 
       if (state.winner === "One" || state.winner === "Two") {
         //console.log("Winner declared!");
-        clearInterval(state.intervalId);
-        state.intervalId = null;
+        clearSessionInterval();
         if (state.winner === "One" && state.matchEnded) {
           dispatch({ type: "PLAYER_ONE_WINS" });
         } else if (state.winner === "Two" && state.matchEnded) {
           dispatch({ type: "PLAYER_TWO_WINS" });
         }
       }
-    
+
       // Cleanup function to clear the interval when the component unmounts
       return () => {
         console.log("cleanup");
         clearSessionInterval();
       };
     }
-    }, [
-      //setInterval,
-      //createInterval,
-      dispatch,
-      state,
-    ]);
+  }, [
+    //setInterval,
+    //createInterval,
+    dispatch,
+    state,
+  ]);
 
   useEffect(() => {
-    if (state.matchEnded && state.minutes <= 0 && state.seconds <= 0 && state.winner === null) {
+    if (
+      state.matchEnded &&
+      state.minutes <= 0 &&
+      state.seconds <= 0 &&
+      state.winner === null
+    ) {
       // Handle timer expire and tally of scores
       //clearSessionInterval();
       console.log("Timer Expired! Tallying Scores...");
@@ -499,7 +493,9 @@ export function Timer(props) {
           state.playerOneAdvantageScore > state.playerTwoAdvantageScore
         ) {
           dispatch({ type: "PLAYER_ONE_WINS" });
-        } else if ( state.playerOneAdvantageScore === state.playerTwoAdvantageScore){
+        } else if (
+          state.playerOneAdvantageScore === state.playerTwoAdvantageScore
+        ) {
           if (state.playerOnePenaltyScore < state.playerTwoPenaltyScore) {
             console.log("Penalty Tallying...");
             dispatch({ type: "PLAYER_ONE_WINS" });
@@ -507,8 +503,9 @@ export function Timer(props) {
             state.playerTwoPenaltyScore < state.playerOnePenaltyScore
           ) {
             dispatch({ type: "PLAYER_TWO_WINS" });
-          } 
-       } else if (
+          }
+        }
+        if (
           state.playerOneScore === state.playerTwoScore &&
           state.playerOneAdvantageScore === state.playerTwoAdvantageScore &&
           state.playerOnePenaltyScore === state.playerTwoPenaltyScore
@@ -518,20 +515,28 @@ export function Timer(props) {
         }
       }
     }
+    return;
   }, [state, dispatch]);
 
   return (
-    <div
-      className="flex items-center justify-center antialiased pl-60 pr-60 rounded font-semibold tracking-widest"
-      onClick={handleStartPause}
-    >
-      {minutes} : {seconds}
-      <div className="flex items-center justify-center">
-        {state.isPaused && (
-          <p className="text-10xl">
-            <FontAwesomeIcon className="fa-2xl" icon={faPause} />
-          </p>
-        )}
+    <div>
+      <div
+        className="flex items-center justify-center antialiased pl-60 pr-60 rounded font-semibold tracking-widest"
+        onClick={handleStartPause}
+      >
+        {minutes} : {seconds}
+        <div className="flex items-center justify-center">
+          {state.isPaused && (
+            <p className="text-10xl">
+              <FontAwesomeIcon className="fa-2xl" icon={faPause} />
+            </p>
+          )}
+        </div>
+      </div>
+      <div className="flex items-center justify-center antialiased">
+        <button onClick={handleStartPause} className="text-2xl">
+          {!state.isRunning ? "Start" : state.isPaused ? "Resume" : "Pause"}
+        </button>
       </div>
     </div>
   );
@@ -861,30 +866,46 @@ export const SettingsDialog = ({ isOpen, onClose, onSetTime }) => {
   };
 
   return (
-    <div className={`settings-modal ${isOpen ? "open" : ""} text-xl`}>
-      <h2>Settings</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="minutes">Minutes:</label>
-          <input
-            type="number"
-            id="minutes"
-            value={minutes}
-            onChange={(e) => setMinutes(parseInt(e.target.value))}
-          />
+    <div
+      id="authentication-modal"
+      // tabindex="-1"
+      aria-hidden="true"
+      className="{isOpen ? 'visible' : 'hidden'} overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
+    >
+      <div className="relative p-4 w-full max-w-md max-h-full font-semibold text-gray-900 dark:text-white">
+        <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
+          <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+              Set match time
+            </h3>
+            <button onClick={handleClose}>Close</button>
+          </div>
+
+          <div className="p-4 md:p-5">
+            <form onSubmit={handleSubmit}>
+              <div>
+                <label htmlFor="minutes">Minutes:</label>
+                <input
+                  type="number"
+                  id="minutes"
+                  value={minutes}
+                  onChange={(e) => setMinutes(parseInt(e.target.value))}
+                />
+              </div>
+              <div>
+                <label htmlFor="seconds">Seconds:</label>
+                <input
+                  type="number"
+                  id="seconds"
+                  value={seconds}
+                  onChange={(e) => setSeconds(parseInt(e.target.value))}
+                />
+              </div>
+              <button type="submit" className="mt-4">Set</button>
+            </form>
+          </div>
         </div>
-        <div>
-          <label htmlFor="seconds">Seconds:</label>
-          <input
-            type="number"
-            id="seconds"
-            value={seconds}
-            onChange={(e) => setSeconds(parseInt(e.target.value))}
-          />
-        </div>
-        <button type="submit">Set</button>
-      </form>
-      <button onClick={handleClose}>Close</button>
+      </div>
     </div>
   );
 };
