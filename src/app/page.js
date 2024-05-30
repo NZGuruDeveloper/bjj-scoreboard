@@ -272,12 +272,7 @@ export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
   //const [settings, setSettings] = useState(false);
 
-  const setTime = (newTime) => {
-    dispatch({ type: "RESET" }); // Reset timer before setting new time
-    dispatch({ type: "SET_COUNTDOWN_TIME", payload: newTime }); // Dispatch new time action
-    console.log("setting new time!");
-    console.log(state);
-  };
+
 
   const handleSettingsClose = () => {
     setIsOpen(false);
@@ -310,9 +305,9 @@ export default function Home() {
                 </button>
                 {isOpen && (
                   <SettingsDialog
-                    //isOpen={isOpen}
+                    isOpen={isOpen}
                     onClose={() => handleSettingsClose()}
-                    onSetTime={() => setTime}
+                    //onSetTime={() => setTime}
                   />
                 )}
                 {/* Settings TODO: control timer, with default 5min control players background
@@ -848,21 +843,37 @@ export function PlayerTwo() {
   );
 }
 
-export const SettingsDialog = ({ isOpen, onClose, onSetTime }) => {
+export const SettingsDialog = ({ isOpen, onClose }) => {
   const { state, dispatch } = useContext(CountdownContext);
   const [minutes, setMinutes] = useState(5);
   const [seconds, setSeconds] = useState(0);
 
-  const handleSubmit = (e) => {
+ /*  const handleSubmit = (e) => {
     e.preventDefault();
     onSetTime({ minutes, seconds });
     //dispatch({type: "SET_COUNTDOWN_TIME"});
     console.log(state);
     onClose();
-  };
+  }; */
 
   const handleClose = () => {
     onClose();
+  };
+  const handleChange = (prop) => (event) => {
+    setState({ ...state, [prop]: event.target.value.padStart(2, "0") });
+  };
+
+  const handleSubmit = () => {
+    console.log("time submitted", minutes, seconds);
+    onSetTime({ minutes: parseInt(minutes), seconds: parseInt(seconds) });
+    onClose();
+  };
+
+  const onSetTime = (newTime) => {
+    console.log(newTime);
+    dispatch({ type: "RESET" }); // Reset timer before setting new time
+    dispatch({ type: "SET_COUNTDOWN_TIME", payload: newTime }); // Dispatch new time action
+    console.log("setting new time!");
   };
 
   return (
@@ -888,6 +899,7 @@ export const SettingsDialog = ({ isOpen, onClose, onSetTime }) => {
                 <input
                   type="number"
                   id="minutes"
+                  className="text-black"
                   value={minutes}
                   onChange={(e) => setMinutes(parseInt(e.target.value))}
                 />
@@ -897,6 +909,7 @@ export const SettingsDialog = ({ isOpen, onClose, onSetTime }) => {
                 <input
                   type="number"
                   id="seconds"
+                  className="text-black"
                   value={seconds}
                   onChange={(e) => setSeconds(parseInt(e.target.value))}
                 />
