@@ -10,6 +10,8 @@ import React, {
   useRef,
 } from "react";
 
+//import useState from "react-usestateref";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faCrown } from "@fortawesome/free-solid-svg-icons";
@@ -21,9 +23,9 @@ const CountdownContext = createContext();
 
 //library.add(faCrown, faSliders, faArrowsRotate);
 
-const initialState = {
-  minutes: 0,
-  seconds: 5,
+let initialState = {
+  minutes: 5,
+  seconds: 0,
   playerOneScore: 0,
   playerOneAdvantageScore: 0,
   playerOnePenaltyScore: 0,
@@ -37,38 +39,11 @@ const initialState = {
   winner: null,
   isMatchReset: false,
   intervalId: null,
+  isSettingDilagogOpen: false,
 };
 
 export const reducer = (state, action) => {
   switch (action.type) {
-    case "MATCH_STARTED":
-      return {
-        ...state,
-        matchStarted: (state.matchStarted = true),
-        isRunning: (state.isRunning = true),
-        isPaused: (state.isPaused = false),
-        seconds: state.seconds <= 0 ? 59 : state.seconds - 1,
-        minutes: state.seconds <= 0 ? state.minutes - 1 : state.minutes,
-      };
-    case "SET_COUNTDOWN_TIME":
-      return {
-        ...state,
-        minutes: action.payload.minutes,
-        seconds: action.payload.seconds === 0 ? 0 : 59,
-      };
-
-    case "MATCH_PAUSED":
-      return {
-        ...state,
-        isRunning: (state.isRunning = false),
-        isPaused: (state.isPaused = true),
-      };
-    case "MATCH_UNPAUSED":
-      return {
-        ...state,
-        isRunning: (state.isRunning = true),
-        isPaused: (state.isPaused = false),
-      };
     // Player One Score Actions
     case "PLAYER_ONE_ADD_SCORE_TWO":
       return {
@@ -217,7 +192,40 @@ export const reducer = (state, action) => {
         playerTwoPenaltyScore: state.playerTwoPenaltyScore - 1,
       };
     // End Player Two Score Actions
+    case "MATCH_STARTED":
+      return {
+        ...state,
+        matchStarted: (state.matchStarted = true),
+        isRunning: (state.isRunning = true),
+        isPaused: (state.isPaused = false),
+        seconds: state.seconds <= 0 ? 59 : state.seconds - 1,
+        minutes: state.seconds <= 0 ? state.minutes - 1 : state.minutes,
+      };
+    case "SET_COUNTDOWN_TIME":
+      (initialState.minutes = action.payload.minutes),
+        (initialState.seconds =
+          action.payload.seconds === 0 ? 0 : action.payload.seconds);
+          console.log(initialState);
+      return {
+        ...state,
+        matchStarted: (state.matchStarted = false),
+        minutes: action.payload.minutes,
+        seconds: action.payload.seconds === 0 ? 0 : action.payload.seconds,
+        isSettingDilagogOpen: (state.isSettingDilagogOpen = false),
+      };
 
+    case "MATCH_PAUSED":
+      return {
+        ...state,
+        isRunning: (state.isRunning = false),
+        isPaused: (state.isPaused = true),
+      };
+    case "MATCH_UNPAUSED":
+      return {
+        ...state,
+        isRunning: (state.isRunning = true),
+        isPaused: (state.isPaused = false),
+      };
     // End of Score Actions
     case "MATCH_ENDED":
       return {
@@ -249,6 +257,18 @@ export const reducer = (state, action) => {
         //matchEnded: (state.matchEnded = true),
       };
 
+    // Settings
+    case "OPEN_SETTINGS":
+      return {
+        ...state,
+        isSettingDilagogOpen: (state.isSettingDilagogOpen = true),
+      };
+    case "CLOSE_SETTINGS":
+      return {
+        ...state,
+        isSettingDilagogOpen: (state.isSettingDilagogOpen = false),
+        //isMatchReset: (state.isMatchReset = true),
+      };
     // Reset Actions
     case "RESET_STATE":
       return initialState;
@@ -269,15 +289,6 @@ export const CountdownProvider = ({ children }) => {
 
 export default function Home() {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const [isOpen, setIsOpen] = useState(false);
-  //const [settings, setSettings] = useState(false);
-
-
-
-  const handleSettingsClose = () => {
-    setIsOpen(false);
-    console.log(isOpen);
-  };
 
   return (
     <CountdownProvider>
@@ -297,19 +308,17 @@ export default function Home() {
             <div className="flex items-start justify-center w-full">
               <div
                 className="bg-[#8CE5BA] w-50 h-35 p-2 text-2xl flex rounded m-4 text-slate-950"
-                onClick={() => setIsOpen(true)}
               >
-                <FontAwesomeIcon className="fa-2xl" icon={faSliders} />{" "}
-                <button className="ml-2 mt-1" onClick={() => setIsOpen(true)}>
+                <button
+                  className="ml-2 mt-1"
+                  onClick={() => dispatch({ type: "OPEN_SETTINGS" })}
+                >
+                  <FontAwesomeIcon className="fa-2xl" icon={faSliders} />{" "}
                   Settings
                 </button>
-                {isOpen && (
-                  <SettingsDialog
-                    isOpen={isOpen}
-                    onClose={() => handleSettingsClose()}
-                    //onSetTime={() => setTime}
-                  />
-                )}
+                {console.log(state.isSettingDilagogOpen)}
+                {state.isSettingDilagogOpen && (
+                <SettingsDialog />)}
                 {/* Settings TODO: control timer, with default 5min control players background
       color future: add upload logo and display logo */}
               </div>
@@ -370,9 +379,10 @@ export function Timer(props) {
   };
 
   useEffect(() => {
-    if (!state.matchEnded || state.matchStarted) {
+    if (!state.matchEnded && state.matchStarted) {
       const createInterval = () => {
         state.intervalId = setInterval(() => {
+          console.log("interval running");
           dispatch({ type: "MATCH_STARTED" });
         }, 1000);
       };
@@ -383,18 +393,23 @@ export function Timer(props) {
         }
       };
 
-      createInterval();
+      //createInterval();
       if (
+        !state.isRunning &&
+        !state.isPaused &&
+        state.matchStarted &&
+        !state.matchEnded
+      ) {
+        console.log("match started");
+        createInterval();
+      } else if (
         state.isRunning &&
         !state.isPaused &&
         state.matchStarted &&
         !state.matchEnded
       ) {
-      } else {
-        // Cleanup function to clear the interval when the component unmounts
-        if (state.intervalId) {
-          clearInterval(state.intervalId);
-        }
+        console.log("match running");
+        createInterval();
       }
 
       if (
@@ -457,6 +472,7 @@ export function Timer(props) {
     state,
   ]);
 
+  // Handle timer expire and tally of scores
   useEffect(() => {
     if (
       state.matchEnded &&
@@ -464,7 +480,6 @@ export function Timer(props) {
       state.seconds <= 0 &&
       state.winner === null
     ) {
-      // Handle timer expire and tally of scores
       //clearSessionInterval();
       console.log("Timer Expired! Tallying Scores...");
       if (state.playerOneScore > state.playerTwoScore) {
@@ -636,45 +651,6 @@ export function SubtractPoint() {
   return <div className="bg-[#B71B1B]">-</div>;
 }
 
-/**
- * Renders the Settings component.
- *
- * @return {JSX.Element} The Settings component.
- */
-export function SettingsBtn() {
-  return (
-    <div
-      className="bg-[#8CE5BA] w-50 h-35 p-2 text-2xl flex rounded m-4 text-slate-950"
-      onClick={() => setSettings(true)}
-    >
-      <FontAwesomeIcon className="fa-2xl" icon={faSliders} />{" "}
-      <button className="ml-2 mt-1" onClick={() => setIsOpen(true)}>
-        Settings
-      </button>
-      {/* Settings TODO: control timer, with default 5min control players background
-      color future: add upload logo and display logo */}
-    </div>
-  );
-}
-
-export function Reset() {
-  const { state, dispatch } = useContext(CountdownContext);
-
-  return (
-    <div
-      className="bg-[#8CE5BA] w-50 h-35 p-2 text-2xl flex rounded m-4 text-slate-950"
-      onClick={() => dispatch({ type: "RESET" })}
-    >
-      <FontAwesomeIcon className="fa-2xl" icon={faArrowsRotate} />{" "}
-      <button className="ml-2 mt-1" onClick={() => dispatch({ type: "RESET" })}>
-        Reset
-      </button>
-      {/* Settings TODO: control timer, with default 5min control players background
-      color future: add upload logo and display logo */}
-    </div>
-  );
-}
-
 export function PlayerOneEndMatch() {
   const { state, dispatch } = useContext(CountdownContext);
   const handlPlayerOneWinning = () => {
@@ -843,82 +819,100 @@ export function PlayerTwo() {
   );
 }
 
-export const SettingsDialog = ({ isOpen, onClose }) => {
+export const SettingsDialog = () => {
   const { state, dispatch } = useContext(CountdownContext);
   const [minutes, setMinutes] = useState(5);
   const [seconds, setSeconds] = useState(0);
 
- /*  const handleSubmit = (e) => {
+  console.log(state.isSettingDilagogOpen);
+  //dispatch({ type: "OPEN_SETTINGS" });
+  const handleSubmit = (e) => {
     e.preventDefault();
-    onSetTime({ minutes, seconds });
-    //dispatch({type: "SET_COUNTDOWN_TIME"});
-    console.log(state);
-    onClose();
-  }; */
-
-  const handleClose = () => {
-    onClose();
-  };
-  const handleChange = (prop) => (event) => {
-    setState({ ...state, [prop]: event.target.value.padStart(2, "0") });
-  };
-
-  const handleSubmit = () => {
     console.log("time submitted", minutes, seconds);
+    dispatch({ type: "CLOSE_SETTINGS" });
+    //dispatch({ tyep: "RESET_STATE"});
     onSetTime({ minutes: parseInt(minutes), seconds: parseInt(seconds) });
-    onClose();
   };
 
   const onSetTime = (newTime) => {
     console.log(newTime);
-    dispatch({ type: "RESET" }); // Reset timer before setting new time
+    //dispatch({ type: "RESET_STATE" }); // Reset timer before setting new time
     dispatch({ type: "SET_COUNTDOWN_TIME", payload: newTime }); // Dispatch new time action
     console.log("setting new time!");
   };
 
   return (
-    <div
-      id="authentication-modal"
-      // tabindex="-1"
-      aria-hidden="true"
-      className="{isOpen ? 'visible' : 'hidden'} overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
-    >
-      <div className="relative p-4 w-full max-w-md max-h-full font-semibold text-gray-900 dark:text-white">
-        <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
-          <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-              Set match time
-            </h3>
-            <button onClick={handleClose}>Close</button>
-          </div>
+    <div>
+      {state.isSettingDilagogOpen && (
+        <div
+          id="authentication-modal"
+          // tabindex="-1"
+          aria-hidden="true"
+          className="{state.isSettingDilagogOpen ? 'visible' : 'hidden'} overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
+        >
+          <div className="relative p-4 w-full max-w-md max-h-full font-semibold text-gray-900 dark:text-white">
+            <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
+              <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Set match time
+                </h3>
+                <button onClick={() => dispatch({ type: "CLOSE_SETTINGS" })}>
+                  Close
+                </button>
+              </div>
 
-          <div className="p-4 md:p-5">
-            <form onSubmit={handleSubmit}>
-              <div>
-                <label htmlFor="minutes">Minutes:</label>
-                <input
-                  type="number"
-                  id="minutes"
-                  className="text-black"
-                  value={minutes}
-                  onChange={(e) => setMinutes(parseInt(e.target.value))}
-                />
+              <div className="p-4 md:p-5">
+                <form onSubmit={handleSubmit}>
+                  <div>
+                    <label htmlFor="minutes">Minutes:</label>
+                    <input
+                      type="number"
+                      id="minutes"
+                      className="text-black"
+                      value={minutes}
+                      onChange={(e) => setMinutes(parseInt(e.target.value))}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="seconds">Seconds:</label>
+                    <input
+                      type="number"
+                      id="seconds"
+                      className="text-black"
+                      value={seconds}
+                      onChange={(e) => setSeconds(parseInt(e.target.value))}
+                    />
+                  </div>
+                  <button type="submit" className="mt-4">
+                    Set
+                  </button>
+                </form>
               </div>
-              <div>
-                <label htmlFor="seconds">Seconds:</label>
-                <input
-                  type="number"
-                  id="seconds"
-                  className="text-black"
-                  value={seconds}
-                  onChange={(e) => setSeconds(parseInt(e.target.value))}
-                />
-              </div>
-              <button type="submit" className="mt-4">Set</button>
-            </form>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
+
+export function Reset() {
+  const { state, dispatch } = useContext(CountdownContext);
+
+  return (
+    <div
+      className="bg-[#8CE5BA] w-50 h-35 p-2 text-2xl flex rounded m-4 text-slate-950"
+      onClick={() => dispatch({ type: "RESET_STATE" })}
+    >
+      <FontAwesomeIcon className="fa-2xl" icon={faArrowsRotate} />{" "}
+      <button
+        className="ml-2 mt-1"
+        onClick={() => dispatch({ type: "RESET_STATE" })}
+      >
+        Reset
+      </button>
+      {/* Settings TODO: control timer, with default 5min control players background
+      color future: add upload logo and display logo */}
+    </div>
+  );
+}
