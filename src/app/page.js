@@ -342,7 +342,8 @@ export default function Home() {
         </div>
         <div>
           <p className="italic underline decoration-sky-500">
-            &copy; This is work in progress, and has a few bugs to sort out
+            &copy; <a href="https://hamedweb.co.nz">hamedweb.co.nz</a> - 
+            This is work in progress, and has a few bugs to sort out
             still before it can be fully usable.
           </p>
           <ul className="list-disc">
