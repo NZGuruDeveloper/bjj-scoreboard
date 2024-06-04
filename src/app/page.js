@@ -21,9 +21,6 @@ import { faPause } from "@fortawesome/free-solid-svg-icons";
 
 //import bellSound from "./assets/sounds/Bell.mp3";
 
-const audioDeclareWinner = new Audio("/assets/sounds/Bell.mp3");
-const audioStartMatch = new Audio("/assets/sounds/StartBell.mp3");
-
 const CountdownContext = createContext();
 
 //library.add(faCrown, faSliders, faArrowsRotate);
@@ -374,6 +371,7 @@ export function Timer(props) {
   const minutes = String(state.minutes).padStart(1, "0");
   const seconds = String(state.seconds).padStart(2, "0");
 
+  const audioStartMatch = new Audio("/assets/sounds/StartBell.mp3");
   const playAudioStartPauseMatch = () => {
     audioStartMatch.play();
   }
@@ -583,6 +581,7 @@ export function DeclareWinner() {
   const { state, dispatch } = useContext(CountdownContext);
 
   
+const audioDeclareWinner = new Audio("/assets/sounds/Bell.mp3");
 
   const playAudioDeclareWinner = () => {
     audioDeclareWinner.play();
