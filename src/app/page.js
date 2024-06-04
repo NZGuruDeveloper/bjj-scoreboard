@@ -19,6 +19,11 @@ import { faSliders } from "@fortawesome/free-solid-svg-icons";
 import { faArrowsRotate } from "@fortawesome/free-solid-svg-icons";
 import { faPause } from "@fortawesome/free-solid-svg-icons";
 
+//import bellSound from "./assets/sounds/Bell.mp3";
+
+const audioDeclareWinner = new Audio("/assets/sounds/Bell.mp3");
+const audioStartMatch = new Audio("/assets/sounds/StartBell.mp3");
+
 const CountdownContext = createContext();
 
 //library.add(faCrown, faSliders, faArrowsRotate);
@@ -196,6 +201,7 @@ export const reducer = (state, action) => {
       return {
         ...state,
         matchStarted: (state.matchStarted = true),
+        isMatchReset: (state.isMatchReset = false),
         isRunning: (state.isRunning = true),
         isPaused: (state.isPaused = false),
         seconds: state.seconds <= 0 ? 59 : state.seconds - 1,
@@ -271,7 +277,9 @@ export const reducer = (state, action) => {
       };
     // Reset Actions
     case "RESET_STATE":
-      return initialState;
+  return {  ...initialState,
+    isMatchReset: (state.isMatchReset = true),
+   } // initialState;
     default:
       return state;
   }
@@ -290,6 +298,9 @@ export const CountdownProvider = ({ children }) => {
 export default function Home() {
   const [state, dispatch] = useReducer(reducer, initialState);
 
+  const handleSettingsOpen = () => {
+    dispatch({ type: "OPEN_SETTINGS" });
+  }
   return (
     <CountdownProvider>
       <main className="flex flex-col items-center justify-center p-4 text-slate-200">
@@ -311,7 +322,7 @@ export default function Home() {
               >
                 <button
                   className="ml-2 mt-1"
-                  onClick={() => dispatch({ type: "OPEN_SETTINGS" })}
+                  onClick={handleSettingsOpen}
                 >
                   <FontAwesomeIcon className="fa-2xl" icon={faSliders} />{" "}
                   Settings
@@ -338,7 +349,7 @@ export default function Home() {
             <p className="font-bold">TODO:</p>
             <li>Fix Settings Dialogue</li>
             <li>Fix the Reset button actions</li>
-            <li>Add sounds to: start, end match, timer finished.</li>
+            <li>Add sounds to: start, end match, timer finished. &#x2713; </li>
             <li>
               Add ability to change the second Competitor score background to
               match with band used.
@@ -361,6 +372,11 @@ export function Timer(props) {
   const minutes = String(state.minutes).padStart(1, "0");
   const seconds = String(state.seconds).padStart(2, "0");
 
+  const playAudioStartPauseMatch = () => {
+    audioStartMatch.play();
+  }
+
+
   /**
    * Handles the start/pause button click. If the match hasn't started, starts the match.
    * If the match is running, pauses it. If the match is paused, unpauses it.
@@ -368,12 +384,14 @@ export function Timer(props) {
   const handleStartPause = () => {
     if (!state.matchStarted) {
       // Start the match if it hasn't started
+      {playAudioStartPauseMatch()}
       dispatch({ type: "MATCH_STARTED" });
     } else if (state.isRunning && !state.isPaused && state.matchStarted) {
       // Pause the match if it's running
       dispatch({ type: "MATCH_PAUSED" });
     } else if (state.isPaused && !state.matchEnded && state.matchStarted) {
       // Unpause the match if it's paused
+      {playAudioStartPauseMatch()}
       dispatch({ type: "MATCH_UNPAUSED" });
     }
   };
@@ -402,12 +420,16 @@ export function Timer(props) {
       ) {
         console.log("match started");
         createInterval();
-      } else if (
+      }  
+      
+      if (
         state.isRunning &&
         !state.isPaused &&
         state.matchStarted &&
-        !state.matchEnded
+        !state.matchEnded &&
+        !state.isMatchReset
       ) {
+        console.log(state);
         console.log("match running");
         createInterval();
       }
@@ -422,7 +444,9 @@ export function Timer(props) {
           dispatch({ type: "MATCH_PAUSED" });
         });
         console.log("match paused");
-      } else if (
+      } 
+      
+      if (
         state.isPaused &&
         !state.matchEnded &&
         !state.matchStarted &&
@@ -430,7 +454,9 @@ export function Timer(props) {
       ) {
         dispatch({ type: "MATCH_UNPAUSED" });
         console.log("match unpaused");
-      } else if (
+      } 
+      
+      if (
         state.matchEnded &&
         state.matchStarted &&
         state.isRunning &&
@@ -545,7 +571,7 @@ export function Timer(props) {
       </div>
       <div className="flex items-center justify-center antialiased">
         <button onClick={handleStartPause} className="text-2xl">
-          {!state.isRunning ? "Start" : state.isPaused ? "Resume" : "Pause"}
+          {(!state.isRunning && !state.isPaused) ? "Start" : state.isPaused ? "Resume" : "Pause"}
         </button>
       </div>
     </div>
@@ -553,15 +579,25 @@ export function Timer(props) {
 }
 export function DeclareWinner() {
   const { state, dispatch } = useContext(CountdownContext);
+
+  
+
+  const playAudioDeclareWinner = () => {
+    audioDeclareWinner.play();
+  }
+
+
   return (
     <div>
       {state.winner === "One" || state.winner === "Two" ? (
         <div className="flex items-center justify-center font-bold uppercase text-xl px-6 py-3 rounded shadow-[inset_0_-2px_15px_#cbd5e1]">
+          {playAudioDeclareWinner()}
           <p className="">Competitor {state.winner} Wins!</p>
           <FontAwesomeIcon className="fa-2xl ml-4" icon={faCrown} />{" "}
         </div>
       ) : state.winner === "Draw" ? (
         <div className="flex items-center justify-center font-bold uppercase text-xl px-6 py-3 rounded shadow-[inset_0_-2px_15px_#cbd5e1]">
+          {playAudioDeclareWinner()}
           <p>Its a DRAW!</p>
         </div>
       ) : (
@@ -843,7 +879,8 @@ export const SettingsDialog = () => {
 
   return (
     <div>
-      {state.isSettingDilagogOpen && (
+      {console.log(state.isSettingDilagogOpen)}
+      {state.isSettingDilagogOpen && ( 
         <div
           id="authentication-modal"
           // tabindex="-1"
