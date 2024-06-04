@@ -300,8 +300,8 @@ export default function Home() {
   }
   return (
     <CountdownProvider>
-      <main className="flex flex-col items-center justify-center p-4 text-slate-200">
-        <div className="bg-slate-9500 p-4 w-70 font-san font-normal text-5xl lg:text-15xl antialiased">
+      <main className=" flex flex-col items-center justify-center p-4 text-slate-200">
+        <div className="shrink bg-slate-9500 p-4 w-70 font-san font-normal text-5xl lg:text-15xl antialiased">
           <div>
             <Timer />
           </div>
