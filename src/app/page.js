@@ -342,7 +342,7 @@ export default function Home() {
         </div>
         <div>
           <p className="italic underline decoration-sky-500">
-            &copy; <a href="https://hamedweb.co.nz">hamedweb.co.nz</a> - 
+            Disclaimer: 
             This is work in progress, and has a few bugs to sort out
             still before it can be fully usable.
           </p>
@@ -356,6 +356,7 @@ export default function Home() {
               match with band used.
             </li>
           </ul>
+          <p className="text-center italic underline decoration-sky-500">&copy; <a href="https://hamedweb.co.nz">hamedweb.co.nz</a></p>
         </div>
       </main>
     </CountdownProvider>
