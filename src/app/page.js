@@ -371,9 +371,14 @@ export function Timer(props) {
   const minutes = String(state.minutes).padStart(1, "0");
   const seconds = String(state.seconds).padStart(2, "0");
 
-  const audioStartMatch = new Audio("/assets/sounds/StartBell.mp3");
+  const [audio, setAudio] = useState(null);
+  useEffect(() => {
+    setAudio(new Audio("/assets/sounds/StartBell.mp3"));
+  }, []);
+
+  //const audioStartMatch = new Audio("/assets/sounds/StartBell.mp3");
   const playAudioStartPauseMatch = () => {
-    audioStartMatch.play();
+    audio.play();
   }
 
 
@@ -581,10 +586,13 @@ export function DeclareWinner() {
   const { state, dispatch } = useContext(CountdownContext);
 
   
-const audioDeclareWinner = new Audio("/assets/sounds/Bell.mp3");
-
+//const audioDeclareWinner = new Audio("/assets/sounds/Bell.mp3");
+const [audio, setAudio] = useState(null);
+  useEffect(() => {
+    setAudio(new Audio("/assets/sounds/Bell.mp3"));
+  }, []);
   const playAudioDeclareWinner = () => {
-    audioDeclareWinner.play();
+    audio.play();
   }
 
 
