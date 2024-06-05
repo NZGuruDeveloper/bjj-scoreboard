@@ -582,6 +582,9 @@ export function Timer(props) {
     </div>
   );
 }
+
+// Declare winner
+export function DeclareWinner() {
   const { state, dispatch } = useContext(CountdownContext);
 
   //const audioDeclareWinner = new Audio("/assets/sounds/Bell.mp3");
