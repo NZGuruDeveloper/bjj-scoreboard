@@ -1,6 +1,15 @@
 "use client";
 //import Image from "next/image";
 //import Clock from "react-live-clock";
+
+/*
+* TODO:
+    Fix Settings Dialogue
+    Fix the Reset button actions
+    Add sounds to: start, end match, timer finished. &#x2713;
+    Add ability to change the second Competitor score background to
+    match with band used.
+*/
 import React, {
   useState,
   useEffect,
@@ -298,7 +307,7 @@ export default function Home() {
   };
   return (
     <CountdownProvider>
-      <main className=" flex flex-col items-center justify-center p-4 text-slate-200">
+      <main className="min-h-screen flex flex-col items-center text-slate-200">
         <div className="shrink bg-slate-9500 p-4 w-70 font-san font-normal text-5xl lg:text-15xl antialiased">
           <div>
             <Timer />
@@ -330,21 +339,24 @@ export default function Home() {
           </div>
         </div>
         <div>
-          <p className="italic underline decoration-sky-500">
+          
+          <ul className="list-disc whitespace-pre-wrap">
+            <p className="font-bold">HOW TO USE:</p>
+            <li>Click settings if you wish to change the timer</li>
+            <li>Click start located under the timer to start or the timer itself</li>
+            <li>To pause the timer, click the pause button or the timer itself </li>
+            <li>To reset the timer, click the reset button</li>
+            <li>To end the match, in the Competitor One or Competitor Two control panel click the Winner 
+              word to declare that competitor the winner.</li> 
+              <li>If the timer ends then the app will tally the score and declare the winner based on the 
+              score entered during the match.</li>
+            <li>If issues start to arise, please reload the page and try again!</li>
+          </ul>
+          <p className="italic underline decoration-sky-500 ">
             Disclaimer: This is work in progress, and has a few bugs to sort out
             still before it can be fully usable.
           </p>
-          <ul className="list-disc">
-            <p className="font-bold">TODO:</p>
-            <li>Fix Settings Dialogue</li>
-            <li>Fix the Reset button actions</li>
-            <li>Add sounds to: start, end match, timer finished. &#x2713; </li>
-            <li>
-              Add ability to change the second Competitor score background to
-              match with band used.
-            </li>
-          </ul>
-          <p className="text-center italic underline decoration-sky-500">
+          <p className="text-center decoration-sky-500">
             &copy; <a href="https://hamedweb.co.nz">hamedweb.co.nz</a>
           </p>
         </div>
