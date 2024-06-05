@@ -29,12 +29,7 @@ import { faArrowsRotate } from "@fortawesome/free-solid-svg-icons";
 import { faPause } from "@fortawesome/free-solid-svg-icons";
 
 //import bellSound from "./assets/sounds/Bell.mp3";
-
-const CountdownContext = createContext();
-
-//library.add(faCrown, faSliders, faArrowsRotate);
-
-let initialState = {
+const initialState = {
   minutes: 5,
   seconds: 0,
   playerOneScore: 0,
@@ -52,6 +47,10 @@ let initialState = {
   intervalId: null,
   isSettingDilagogOpen: false,
 };
+
+const CountdownContext = createContext({state:initialState,dispatch:null});
+
+//library.add(faCrown, faSliders, faArrowsRotate);
 
 export const reducer = (state, action) => {
   switch (action.type) {
@@ -283,7 +282,7 @@ export const reducer = (state, action) => {
       };
     // Reset Actions
     case "RESET_STATE":
-      return { ...initialState, isMatchReset: (state.isMatchReset = true) }; // initialState;
+      return initialState; // initialState;
     default:
       return state;
   }
@@ -376,6 +375,8 @@ export function Timer(props) {
   const minutes = String(state.minutes).padStart(1, "0");
   const seconds = String(state.seconds).padStart(2, "0");
 
+  const thisState = state;
+
   const [audio, setAudio] = useState(null);
   useEffect(() => {
     setAudio(new Audio("/assets/sounds/StartBell.mp3"));
@@ -413,7 +414,7 @@ export function Timer(props) {
     if (!state.matchEnded && state.matchStarted) {
       const createInterval = () => {
         state.intervalId = setInterval(() => {
-          console.log("interval running");
+         // console.log("interval running");
           dispatch({ type: "MATCH_STARTED" });
         }, 1000);
       };
@@ -442,8 +443,8 @@ export function Timer(props) {
         !state.matchEnded &&
         !state.isMatchReset
       ) {
-        console.log(state);
-        console.log("match running");
+        //console.log(state);
+        //console.log("match running");
         createInterval();
       }
 
@@ -500,7 +501,7 @@ export function Timer(props) {
 
       // Cleanup function to clear the interval when the component unmounts
       return () => {
-        console.log("cleanup");
+        //console.log("cleanup");
         clearSessionInterval();
       };
     }
