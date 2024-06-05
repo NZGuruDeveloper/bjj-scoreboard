@@ -938,10 +938,8 @@ export const SettingsDialog = ({
     <div>
       {isOpen && (
         <div
-          id="authentication-modal"
-          // tabindex="-1"
           aria-hidden="true"
-          className="{state.isSettingDilagogOpen ? 'visible' : 'hidden'} overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
+          className="{{isOpen ? 'visible' : 'hidden'}} overflow-y-auto overflow-x-auto fixed justify-center items-center flex inset-0 z-50 outline-none focus:outline focus:outline-2"
         >
           <div className="relative p-4 w-full max-w-md max-h-full font-semibold text-gray-900 dark:text-white">
             <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
@@ -958,6 +956,8 @@ export const SettingsDialog = ({
                     <label htmlFor="minutes">Minutes:</label>
                     <input
                       type="number"
+                      min={0}
+                      max={30}
                       id="minutes"
                       className="text-black"
                       value={minutes}
@@ -969,6 +969,7 @@ export const SettingsDialog = ({
                     <input
                       type="number"
                       id="seconds"
+                      min={0}
                       className="text-black"
                       value={seconds}
                       onChange={(e) => setSeconds(parseInt(e.target.value))}
