@@ -48,7 +48,7 @@ const initialState = {
   isSettingDilagogOpen: false,
 };
 
-const CountdownContext = createContext({state:initialState,dispatch:null});
+const CountdownContext = createContext(null);
 
 //library.add(faCrown, faSliders, faArrowsRotate);
 
@@ -216,13 +216,12 @@ export const reducer = (state, action) => {
       (initialState.minutes = action.payload.minutes),
         (initialState.seconds =
           action.payload.seconds === 0 ? 0 : action.payload.seconds);
-      console.log(initialState);
+      //console.log(initialState);
       return {
         ...state,
         matchStarted: (state.matchStarted = false),
         minutes: action.payload.minutes,
         seconds: action.payload.seconds === 0 ? 0 : action.payload.seconds,
-        isSettingDilagogOpen: (state.isSettingDilagogOpen = false),
       };
 
     case "MATCH_PAUSED":
@@ -282,7 +281,23 @@ export const reducer = (state, action) => {
       };
     // Reset Actions
     case "RESET_STATE":
-      return initialState; // initialState;
+      return {
+        ...initialState,
+        playerOneScore: 0,
+        playerOneAdvantageScore: 0,
+        playerOnePenaltyScore: 0,
+        playerTwoScore: 0,
+        playerTwoAdvantageScore: 0,
+        playerTwoPenaltyScore: 0,
+        matchStarted: false,
+        isRunning: false,
+        matchEnded: false,
+        isPaused: false,
+        winner: null,
+        isMatchReset: false,
+        intervalId: null,
+        isSettingDilagogOpen: false,
+      }; // initialState;
     default:
       return state;
   }
@@ -299,11 +314,12 @@ export const CountdownProvider = ({ children }) => {
 };
 
 export default function Home() {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [isSettingDilagogOpen, setIsSettingDilagogOpen] = useState(false);
 
   const handleSettingsOpen = () => {
-    dispatch({ type: "OPEN_SETTINGS" });
+    setIsSettingDilagogOpen(true);
   };
+
   return (
     <CountdownProvider>
       <main className="min-h-screen flex flex-col items-center text-slate-200">
@@ -325,8 +341,10 @@ export default function Home() {
                   <FontAwesomeIcon className="fa-2xl" icon={faSliders} />{" "}
                   Settings
                 </button>
-                {console.log(state.isSettingDilagogOpen)}
-                {state.isSettingDilagogOpen && <SettingsDialog />}
+                <SettingsDialog
+                  isSettingDilagogOpen={isSettingDilagogOpen}
+                  setIsSettingDilagogOpen={setIsSettingDilagogOpen}
+                />
                 {/* Settings TODO: control timer, with default 5min control players background
       color future: add upload logo and display logo */}
               </div>
@@ -338,18 +356,27 @@ export default function Home() {
           </div>
         </div>
         <div>
-          
           <ul className="list-disc whitespace-pre-wrap">
             <p className="font-bold">HOW TO USE:</p>
             <li>Click settings if you wish to change the timer</li>
-            <li>Click start located under the timer to start or the timer itself</li>
-            <li>To pause the timer, click the pause button or the timer itself </li>
+            <li>
+              Click start located under the timer to start or the timer itself
+            </li>
+            <li>
+              To pause the timer, click the pause button or the timer itself{" "}
+            </li>
             <li>To reset the timer, click the reset button</li>
-            <li>To end the match, in the Competitor One or Competitor Two control panel click the Winner 
-              word to declare that competitor the winner.</li> 
-              <li>If the timer ends then the app will tally the score and declare the winner based on the 
-              score entered during the match.</li>
-            <li>If issues start to arise, please reload the page and try again!</li>
+            <li>
+              To end the match, in the Competitor One or Competitor Two control
+              panel click the Winner word to declare that competitor the winner.
+            </li>
+            <li>
+              If the timer ends then the app will tally the score and declare
+              the winner based on the score entered during the match.
+            </li>
+            <li>
+              If issues start to arise, please reload the page and try again!
+            </li>
           </ul>
           <p className="italic underline decoration-sky-500 ">
             Disclaimer: This is work in progress, and has a few bugs to sort out
@@ -414,7 +441,7 @@ export function Timer(props) {
     if (!state.matchEnded && state.matchStarted) {
       const createInterval = () => {
         state.intervalId = setInterval(() => {
-         // console.log("interval running");
+          // console.log("interval running");
           dispatch({ type: "MATCH_STARTED" });
         }, 1000);
       };
@@ -598,7 +625,7 @@ export function Timer(props) {
 
 // Declare winner
 export function DeclareWinner() {
-  const { state, dispatch } = useContext(CountdownContext);
+  const { state } = useContext(CountdownContext);
 
   //const audioDeclareWinner = new Audio("/assets/sounds/Bell.mp3");
   const [audio, setAudio] = useState(null);
@@ -877,32 +904,39 @@ export function PlayerTwo() {
   );
 }
 
-export const SettingsDialog = () => {
-  const { state, dispatch } = useContext(CountdownContext);
+export const SettingsDialog = ({
+  isSettingDilagogOpen,
+  setIsSettingDilagogOpen,
+}) => {
+  const { dispatch } = useContext(CountdownContext);
   const [minutes, setMinutes] = useState(5);
   const [seconds, setSeconds] = useState(0);
 
-  console.log(state.isSettingDilagogOpen);
-  //dispatch({ type: "OPEN_SETTINGS" });
+  const [isOpen, setIsOpen] = useState(true);
+
+  useEffect(() => {
+    setIsOpen(isSettingDilagogOpen);
+  }, [isSettingDilagogOpen]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("time submitted", minutes, seconds);
-    dispatch({ type: "CLOSE_SETTINGS" });
-    //dispatch({ tyep: "RESET_STATE"});
+    setIsOpen(false);
+    setIsSettingDilagogOpen(!isSettingDilagogOpen);
     onSetTime({ minutes: parseInt(minutes), seconds: parseInt(seconds) });
   };
 
   const onSetTime = (newTime) => {
-    console.log(newTime);
-    //dispatch({ type: "RESET_STATE" }); // Reset timer before setting new time
     dispatch({ type: "SET_COUNTDOWN_TIME", payload: newTime }); // Dispatch new time action
-    console.log("setting new time!");
+  };
+
+  const handleClose = () => {
+    setIsOpen(false);
+    setIsSettingDilagogOpen(!isSettingDilagogOpen);
   };
 
   return (
     <div>
-      {console.log(state.isSettingDilagogOpen)}
-      {state.isSettingDilagogOpen && (
+      {isOpen && (
         <div
           id="authentication-modal"
           // tabindex="-1"
@@ -915,9 +949,7 @@ export const SettingsDialog = () => {
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
                   Set match time
                 </h3>
-                <button onClick={() => dispatch({ type: "CLOSE_SETTINGS" })}>
-                  Close
-                </button>
+                <button onClick={() => handleClose()}>Close</button>
               </div>
 
               <div className="p-4 md:p-5">
@@ -958,16 +990,17 @@ export const SettingsDialog = () => {
 export function Reset() {
   const { state, dispatch } = useContext(CountdownContext);
 
+  const handlReset = () => {
+    dispatch({ type: "RESET_STATE" });
+  };
+
   return (
     <div
       className="bg-[#8CE5BA] w-50 h-35 p-2 text-2xl flex rounded m-4 text-slate-950"
       onClick={() => dispatch({ type: "RESET_STATE" })}
     >
       <FontAwesomeIcon className="fa-2xl" icon={faArrowsRotate} />{" "}
-      <button
-        className="ml-2 mt-1"
-        onClick={() => dispatch({ type: "RESET_STATE" })}
-      >
+      <button className="ml-2 mt-1" onClick={() => handlReset()}>
         Reset
       </button>
       {/* Settings TODO: control timer, with default 5min control players background
