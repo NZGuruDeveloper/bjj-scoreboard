@@ -208,7 +208,7 @@ export const reducer = (state, action) => {
       (initialState.minutes = action.payload.minutes),
         (initialState.seconds =
           action.payload.seconds === 0 ? 0 : action.payload.seconds);
-          console.log(initialState);
+      console.log(initialState);
       return {
         ...state,
         matchStarted: (state.matchStarted = false),
@@ -274,9 +274,7 @@ export const reducer = (state, action) => {
       };
     // Reset Actions
     case "RESET_STATE":
-  return {  ...initialState,
-    isMatchReset: (state.isMatchReset = true),
-   } // initialState;
+      return { ...initialState, isMatchReset: (state.isMatchReset = true) }; // initialState;
     default:
       return state;
   }
@@ -297,7 +295,7 @@ export default function Home() {
 
   const handleSettingsOpen = () => {
     dispatch({ type: "OPEN_SETTINGS" });
-  }
+  };
   return (
     <CountdownProvider>
       <main className=" flex flex-col items-center justify-center p-4 text-slate-200">
@@ -314,19 +312,13 @@ export default function Home() {
           </div>
           <div className="grid items-center justify-center">
             <div className="flex items-start justify-center w-full">
-              <div
-                className="bg-[#8CE5BA] w-50 h-35 p-2 text-2xl flex rounded m-4 text-slate-950"
-              >
-                <button
-                  className="ml-2 mt-1"
-                  onClick={handleSettingsOpen}
-                >
+              <div className="bg-[#8CE5BA] w-50 h-35 p-2 text-2xl flex rounded m-4 text-slate-950">
+                <button className="ml-2 mt-1" onClick={handleSettingsOpen}>
                   <FontAwesomeIcon className="fa-2xl" icon={faSliders} />{" "}
                   Settings
                 </button>
                 {console.log(state.isSettingDilagogOpen)}
-                {state.isSettingDilagogOpen && (
-                <SettingsDialog />)}
+                {state.isSettingDilagogOpen && <SettingsDialog />}
                 {/* Settings TODO: control timer, with default 5min control players background
       color future: add upload logo and display logo */}
               </div>
@@ -339,8 +331,7 @@ export default function Home() {
         </div>
         <div>
           <p className="italic underline decoration-sky-500">
-            Disclaimer: 
-            This is work in progress, and has a few bugs to sort out
+            Disclaimer: This is work in progress, and has a few bugs to sort out
             still before it can be fully usable.
           </p>
           <ul className="list-disc">
@@ -353,7 +344,9 @@ export default function Home() {
               match with band used.
             </li>
           </ul>
-          <p className="text-center italic underline decoration-sky-500">&copy; <a href="https://hamedweb.co.nz">hamedweb.co.nz</a></p>
+          <p className="text-center italic underline decoration-sky-500">
+            &copy; <a href="https://hamedweb.co.nz">hamedweb.co.nz</a>
+          </p>
         </div>
       </main>
     </CountdownProvider>
@@ -379,8 +372,7 @@ export function Timer(props) {
   //const audioStartMatch = new Audio("/assets/sounds/StartBell.mp3");
   const playAudioStartPauseMatch = () => {
     audio.play();
-  }
-
+  };
 
   /**
    * Handles the start/pause button click. If the match hasn't started, starts the match.
@@ -389,14 +381,18 @@ export function Timer(props) {
   const handleStartPause = () => {
     if (!state.matchStarted) {
       // Start the match if it hasn't started
-      {playAudioStartPauseMatch()}
+      {
+        playAudioStartPauseMatch();
+      }
       dispatch({ type: "MATCH_STARTED" });
     } else if (state.isRunning && !state.isPaused && state.matchStarted) {
       // Pause the match if it's running
       dispatch({ type: "MATCH_PAUSED" });
     } else if (state.isPaused && !state.matchEnded && state.matchStarted) {
       // Unpause the match if it's paused
-      {playAudioStartPauseMatch()}
+      {
+        playAudioStartPauseMatch();
+      }
       dispatch({ type: "MATCH_UNPAUSED" });
     }
   };
@@ -425,8 +421,8 @@ export function Timer(props) {
       ) {
         console.log("match started");
         createInterval();
-      }  
-      
+      }
+
       if (
         state.isRunning &&
         !state.isPaused &&
@@ -449,8 +445,8 @@ export function Timer(props) {
           dispatch({ type: "MATCH_PAUSED" });
         });
         console.log("match paused");
-      } 
-      
+      }
+
       if (
         state.isPaused &&
         !state.matchEnded &&
@@ -459,8 +455,8 @@ export function Timer(props) {
       ) {
         dispatch({ type: "MATCH_UNPAUSED" });
         console.log("match unpaused");
-      } 
-      
+      }
+
       if (
         state.matchEnded &&
         state.matchStarted &&
@@ -576,25 +572,26 @@ export function Timer(props) {
       </div>
       <div className="flex items-center justify-center antialiased">
         <button onClick={handleStartPause} className="text-2xl">
-          {(!state.isRunning && !state.isPaused) ? "Start" : state.isPaused ? "Resume" : "Pause"}
+          {!state.isRunning && !state.isPaused
+            ? "Start"
+            : state.isPaused
+            ? "Resume"
+            : "Pause"}
         </button>
       </div>
     </div>
   );
 }
-export function DeclareWinner() {
   const { state, dispatch } = useContext(CountdownContext);
 
-  
-//const audioDeclareWinner = new Audio("/assets/sounds/Bell.mp3");
-const [audio, setAudio] = useState(null);
+  //const audioDeclareWinner = new Audio("/assets/sounds/Bell.mp3");
+  const [audio, setAudio] = useState(null);
   useEffect(() => {
     setAudio(new Audio("/assets/sounds/Bell.mp3"));
   }, []);
   const playAudioDeclareWinner = () => {
     audio.play();
-  }
-
+  };
 
   return (
     <div>
@@ -889,7 +886,7 @@ export const SettingsDialog = () => {
   return (
     <div>
       {console.log(state.isSettingDilagogOpen)}
-      {state.isSettingDilagogOpen && ( 
+      {state.isSettingDilagogOpen && (
         <div
           id="authentication-modal"
           // tabindex="-1"
