@@ -970,6 +970,7 @@ export const SettingsDialog = ({
                       type="number"
                       id="seconds"
                       min={0}
+                      max={59}
                       className="text-black"
                       value={seconds}
                       onChange={(e) => setSeconds(parseInt(e.target.value))}
