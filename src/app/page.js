@@ -209,8 +209,8 @@ export const reducer = (state, action) => {
         isMatchReset: (state.isMatchReset = false),
         isRunning: (state.isRunning = true),
         isPaused: (state.isPaused = false),
-        seconds: state.seconds <= 0 ? 59 : state.seconds - 1,
-        minutes: state.seconds <= 0 ? state.minutes - 1 : state.minutes,
+        seconds: state.seconds === 0 ? 59 : state.seconds - 1,
+        minutes: state.seconds === 0 ? state.minutes - 1 : state.minutes,
       };
     case "SET_COUNTDOWN_TIME":
       (initialState.minutes = action.payload.minutes),
@@ -424,6 +424,7 @@ export function Timer(props) {
       {
         playAudioStartPauseMatch();
       }
+      dispatch({ type: "RESET_STATE" });
       dispatch({ type: "MATCH_STARTED" });
     } else if (state.isRunning && !state.isPaused && state.matchStarted) {
       // Pause the match if it's running
@@ -939,10 +940,10 @@ export const SettingsDialog = ({
       {isOpen && (
         <div
           aria-hidden="true"
-          className="{{isOpen ? 'visible' : 'hidden'}} overflow-y-auto overflow-x-auto fixed justify-center items-center flex inset-0 z-50 outline-none focus:outline focus:outline-2"
+          className="{{isOpen ? 'visible' : 'hidden'}} overflow-y-auto overflow-x-auto fixed justify-center items-center flex inset-0 z-50 outline-none focus:outline"
         >
-          <div className="relative p-4 w-full max-w-md max-h-full font-semibold text-gray-900 dark:text-white">
-            <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
+          <div className=" p-4 w-full max-w-md max-h-full font-semibold text-gray-900 dark:text-white">
+            <div className="bg-white rounded-lg shadow dark:bg-gray-700">
               <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
                   Set match time
@@ -951,7 +952,7 @@ export const SettingsDialog = ({
               </div>
 
               <div className="p-4 md:p-5">
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                   <div>
                     <label htmlFor="minutes">Minutes:</label>
                     <input
