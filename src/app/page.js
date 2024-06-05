@@ -952,7 +952,7 @@ export const SettingsDialog = ({
               </div>
 
               <div className="p-4 md:p-5">
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                <form onSubmit={handleSubmit} className="flex flex-col-2 justify-between gap-6">
                   <div>
                     <label htmlFor="minutes">Minutes:</label>
                     <input
