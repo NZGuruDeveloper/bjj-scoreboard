@@ -55,6 +55,11 @@ const CountdownContext = createContext(null);
 export const reducer = (state, action) => {
   switch (action.type) {
     // Player One Score Actions
+    case "PLAYER_ONE_ADD_SCORE_ONE":
+      return {
+        ...state,
+        playerOneScore: state.playerOneScore + 1,
+      };
     case "PLAYER_ONE_ADD_SCORE_TWO":
       return {
         ...state,
@@ -130,6 +135,11 @@ export const reducer = (state, action) => {
     // End of Player One Score Actions
 
     // Player Two Score Actions
+    case "PLAYER_TWO_ADD_SCORE_ONE":
+      return {
+        ...state,
+        playerTwoScore: state.playerTwoScore + 1,
+      };
     case "PLAYER_TWO_ADD_SCORE_TWO":
       return {
         ...state,
@@ -322,24 +332,23 @@ export default function Home() {
 
   return (
     <CountdownProvider>
-      <main className="min-h-screen flex flex-col items-center text-slate-200">
-        <div className="shrink bg-slate-9500 p-4 w-70 font-san font-normal text-5xl lg:text-15xl antialiased">
+      <main className="min-h-screen flex flex-col items-center dark:text-slate-200">
+        <div className=" dark:bg-slate-9500 p-4 lg:w-70 font-san font-normal text-5xl lg:text-15xl antialiased">
           <div>
             <Timer />
           </div>
           <DeclareWinner />
-          <div className="flex flex-col items-start justify-center text-3xl text-slate-400">
+          <div className="lg:flex lg:flex-col lg:items-start lg:justify-center text-xl lg:text-3xl dark:text-slate-400">
             <h3>Competitor One</h3>
             <PlayerOne />
             <h3>Competitor Two</h3>
             <PlayerTwo />
           </div>
-          <div className="grid items-center justify-center">
-            <div className="flex items-start justify-center w-full">
-              <div className="bg-[#8CE5BA] w-50 h-35 p-2 text-2xl flex rounded m-4 text-slate-950">
-                <button className="ml-2 mt-1" onClick={handleSettingsOpen}>
-                  <FontAwesomeIcon className="fa-2xl" icon={faSliders} />{" "}
-                  Settings
+          <div className="lg:grid lg:items-center lg:justify-center">
+            <div className="flex items-center justify-center gap-4 lg:gap-8 w-full">
+              <div className="bg-[#8CE5BA] w-[130px] lg:w-[150px] lg:h-[55px] p-2 text-xl lg:text-2xl flex items-center justify-center rounded text-slate-950">
+                <button className="" onClick={handleSettingsOpen}>
+                  <FontAwesomeIcon className="" icon={faSliders} /> Settings
                 </button>
                 <SettingsDialog
                   isSettingDilagogOpen={isSettingDilagogOpen}
@@ -349,13 +358,10 @@ export default function Home() {
       color future: add upload logo and display logo */}
               </div>
               <Reset />
-              <p className="text-5xl p-4 text-slate-400">
-                {/* <Clock format={"h:mm A"} ticking={true} /> */}
-              </p>
             </div>
           </div>
         </div>
-        <div>
+        <div className="ml-5 antialiased">
           <ul className="list-disc whitespace-pre-wrap">
             <p className="font-bold">HOW TO USE:</p>
             <li>Click settings if you wish to change the timer</li>
@@ -599,20 +605,23 @@ export function Timer(props) {
   return (
     <div>
       <div
-        className="flex items-center justify-center antialiased pl-60 pr-60 rounded font-semibold tracking-widest"
+        className="lg:flex lg:items-center lg:justify-center text-center text-5xl lg:text-15xl antialiased lg:pl-60 lg:pr-60 rounded font-semibold tracking-widest "
         onClick={handleStartPause}
       >
         {minutes} : {seconds}
         <div className="flex items-center justify-center">
           {state.isPaused && (
-            <p className="text-10xl">
-              <FontAwesomeIcon className="fa-2xl" icon={faPause} />
+            <p className="">
+              <FontAwesomeIcon className="" icon={faPause} />
             </p>
           )}
         </div>
       </div>
       <div className="flex items-center justify-center antialiased">
-        <button onClick={handleStartPause} className="text-2xl">
+        <button
+          onClick={handleStartPause}
+          className="p-2 mb-2 rounded-3xl text-sm lg:text-2xl bg-gradient-to-r from-indigo-700[0.9] to-purple-600[0.3] dark:text-white shadow-none focus:ring-4  focus:ring-blue-300 font-medium  px-7 py-3 focus:outline-none dark:focus:ring-blue-800 bg-transparent"
+        >
           {!state.isRunning && !state.isPaused
             ? "Start"
             : state.isPaused
@@ -667,21 +676,31 @@ export function PlayerOneScore() {
   const winner = "competitor1"; */
   const { state, dispatch } = useContext(CountdownContext);
 
-  const [playerOneScore, setPlayerOneScore] = useState(0);
-  const [playerOneAdvantageScore, setPlayerOneAdvantageScore] = useState(0);
-  const [playerOnePenaltyScore, setPlayerOnePenaltyScore] = useState(0);
   return (
-    <div className="flex flex-col-2 items-between justify-between ">
-      <div className="z-10 bg-slate-300 text-center w-[170px] rounded font-bold text-15xl text-black">
-        <p className="">{state.playerOneScore}</p>
+    <div className="flex flex-col-2 justify-center mt-2 lg:m-0 lg:items-between lg:justify-between  ">
+      <div
+        className="h-1/2 lg:h-full bg-slate-300 text-center w-1/2 lg:w-[170px] rounded font-bold text-10xl lg:text-15xl text-black"
+        onClick={() => dispatch({ type: "PLAYER_ONE_ADD_SCORE_ONE" })}
+      >
+        {state.playerOneScore}
       </div>
       <div className="text-sm ml-2 text-center">
-        <div className="text-[#8CE5BA]">Advantage</div>
-        <div className="-[#8CE5BA] text-5xl mb-4">
+        <div className="text-[#619b7f] dark:text-[#8CE5BA] bg-slate-50 rounded p-1 dark:bg-inherit">
+          Advantage
+        </div>
+        <div
+          className="text-2xl lg:text-5xl"
+          onClick={() => dispatch({ type: "PLAYER_ONE_ADD_ADVANTAGE" })}
+        >
           {state.playerOneAdvantageScore}
         </div>
-        <div className="text-red-800">Penalty</div>
-        <div className="text-5xl text-red-800">
+        <div className="text-red-600 bg-slate-50 rounded p-1 dark:bg-inherit">
+          Penalty
+        </div>
+        <div
+          className="text-2xl lg:text-5xl mb-4 text-red-800"
+          onClick={() => dispatch({ type: "PLAYER_ONE_ADD_PENALTY" })}
+        >
           {state.playerOnePenaltyScore}
         </div>
       </div>
@@ -701,17 +720,24 @@ export function PlayerTwoScore() {
   const [playerTwoPenaltyScore, setPlayerTwoPenaltyScore] = useState(0); */
 
   return (
-    <div className="flex flex-col-2 items-between justify-between ">
-      <div className="z-10 bg-red-300 text-center w-[170px] rounded font-bold text-15xl text-black">
+    <div className="flex flex-col-2 justify-center mt-2 lg:m-0 lg:items-between lg:justify-between ">
+      <div className="h-1/2 lg:h-full bg-red-300 text-center w-[170px] rounded font-bold text-10xl lg:text-15xl text-black"
+        onClick={() => dispatch({ type: "PLAYER_TWO_ADD_SCORE_ONE" })}>
         <p className="">{state.playerTwoScore}</p>
       </div>
       <div className="text-sm ml-2 text-center">
-        <div className="text-[#8CE5BA]">Advantage</div>
-        <div className="-[#8CE5BA] text-5xl mb-4">
+        <div className="text-[#619b7f] dark:text-[#8CE5BA] bg-slate-50 rounded p-1 dark:bg-inherit">
+          Advantage
+        </div>
+        <div className="text-2xl lg:text-5xl"
+          onClick={() => dispatch({ type: "PLAYER_TWO_ADD_ADVANTAGE" })}>
           {state.playerTwoAdvantageScore}
         </div>
-        <div className="text-red-800">Penalty</div>
-        <div className="text-5xl text-red-800">
+        <div className="text-red-600 bg-slate-50 rounded p-1 dark:bg-inherit">
+          Penalty
+        </div>
+        <div className="text-2xl lg:text-5xl mb-4 text-red-800"
+          onClick={() => dispatch({ type: "PLAYER_TWO_ADD_PENALTY" })}>
           {state.playerTwoPenaltyScore}
         </div>
       </div>
@@ -744,7 +770,7 @@ export function PlayerOneEndMatch() {
   };
   return (
     <div className="flex items-center justify-center text-[#8CE5BA]">
-      <button onClick={handlPlayerOneWinning} className="ml-2 ">
+      <button onClick={handlPlayerOneWinning} className="ml-4 mt-1">
         Winner
       </button>
     </div>
@@ -758,7 +784,7 @@ export function PlayerTwoEndMatch() {
   };
   return (
     <div className="flex items-center justify-center text-[#8CE5BA]">
-      <button onClick={handlPlayerTwoWinning} className="ml-2 ">
+      <button onClick={handlPlayerTwoWinning} className="ml-4 mt-1">
         Winner
       </button>
     </div>
@@ -802,16 +828,16 @@ export function PlayerOneControls() {
   };
 
   return (
-    <div className="text-xl tracking-wide w-[700px] flex flex-col-2 gap-4 bg-slate-950 p-4 mr-4">
+    <div className="text-sm size-max lg:text-xl lg:tracking-wide w-full lg:w-[700px] flex lg:flex-col-2  lg:gap-4 bg-slate-950 p-4 lg:mr-4 ">
       <div className="">
-        <div className="text-[#8CE5BA] grid grid-rows-1 grid-flow-col gap-4">
+        <div className="text-[#8CE5BA] grid grid-rows-1 grid-flow-col gap-5">
           <button onClick={handlPlayerOneAddScoreTwo}>+2</button>
           <button onClick={handlPlayerOneAddScoreThree}>+3</button>
           <button onClick={handlPlayerOneAddScoreFoure}>+4</button>
           <button onClick={handlPlayerOneAddAdvantage}>+Advantage</button>
           <button onClick={handlPlayerOneAddPenalty}>+Penalty</button>
         </div>
-        <div className="text-red-800 grid grid-rows-1 grid-flow-col gap-4">
+        <div className="text-red-400 grid grid-rows-1 grid-flow-col gap-5 mt-2">
           <button onClick={handlPlayerOneSubtractScoreTwo}>-2</button>
           <button onClick={handlPlayerOneSubtractScoreThree}>-3</button>
           <button onClick={handlPlayerOneSubtractScoreFoure}>-4</button>
@@ -863,16 +889,16 @@ export function PlayerTwoControls() {
   };
 
   return (
-    <div className="text-xl tracking-wide w-[700px] flex flex-col-2 gap-4 bg-slate-950 p-4 mr-4">
+    <div className="text-sm size-max lg:text-xl lg:tracking-wide w-full lg:w-[700px] flex lg:flex-col-2  lg:gap-4 bg-slate-950 p-4 lg:mr-4 ">
       <div className="">
-        <div className="text-[#8CE5BA] grid grid-rows-1 grid-flow-col gap-4">
+        <div className="text-[#8CE5BA] grid grid-rows-1 grid-flow-col gap-6">
           <button onClick={handlPlayerTwoAddScoreTwo}>+2</button>
           <button onClick={handlPlayerTwoAddScoreThree}>+3</button>
           <button onClick={handlPlayerTwoAddScoreFoure}>+4</button>
           <button onClick={handlPlayerTwoAddAdvantage}>+Advantage</button>
           <button onClick={handlPlayerTwoAddPenalty}>+Penalty</button>
         </div>
-        <div className="text-red-800 grid grid-rows-1 grid-flow-col gap-4">
+        <div className="text-red-400 grid grid-rows-1 grid-flow-col gap-6 mt-2">
           <button onClick={handlPlayerTwoSubtractScoreTwo}>-2</button>
           <button onClick={handlPlayerTwoSubtractScoreThree}>-3</button>
           <button onClick={handlPlayerTwoSubtractScoreFoure}>-4</button>
@@ -940,11 +966,11 @@ export const SettingsDialog = ({
       {isOpen && (
         <div
           aria-hidden="true"
-          className="{{isOpen ? 'visible' : 'hidden'}} overflow-y-auto overflow-x-auto fixed justify-center items-center flex inset-0 z-50 outline-none focus:outline"
+          className="ml-[-12px] lg:ml-0 overflow-y-auto overflow-x-auto fixed flex justify-center items-center inset-0 z-50 outline-none focus:outline"
         >
-          <div className=" p-4 w-full max-w-md max-h-full font-semibold text-gray-900 dark:text-white">
-            <div className="bg-white rounded-lg shadow dark:bg-gray-700">
-              <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+          <div className="p-4 w-full max-w-md max-h-full font-semibold text-gray-900 dark:text-white">
+            <div className="bg-slate-200 rounded-lg shadow dark:bg-gray-700">
+              <div className="flex justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
                   Set match time
                 </h3>
@@ -952,7 +978,10 @@ export const SettingsDialog = ({
               </div>
 
               <div className="p-4 md:p-5">
-                <form onSubmit={handleSubmit} className="flex flex-col-2 justify-between gap-6">
+                <form
+                  onSubmit={handleSubmit}
+                  className="flex flex-col justify-between gap-6"
+                >
                   <div>
                     <label htmlFor="minutes">Minutes:</label>
                     <input
@@ -999,11 +1028,11 @@ export function Reset() {
 
   return (
     <div
-      className="bg-[#8CE5BA] w-50 h-35 p-2 text-2xl flex rounded m-4 text-slate-950"
+      className="bg-[#8CE5BA] w-[100px] lg:w-[150px] lg:h-[55px] p-2 text-xl lg:text-2xl flex items-center justify-center rounded text-slate-950"
       onClick={() => dispatch({ type: "RESET_STATE" })}
     >
-      <FontAwesomeIcon className="fa-2xl" icon={faArrowsRotate} />{" "}
-      <button className="ml-2 mt-1" onClick={() => handlReset()}>
+      <FontAwesomeIcon className="mt-1 mr-1" icon={faArrowsRotate} />{" "}
+      <button className="" onClick={() => handlReset()}>
         Reset
       </button>
       {/* Settings TODO: control timer, with default 5min control players background
