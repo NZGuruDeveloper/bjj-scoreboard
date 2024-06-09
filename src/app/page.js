@@ -333,7 +333,7 @@ export default function Home() {
   return (
     <CountdownProvider>
       <main className="min-h-screen flex flex-col items-center dark:text-slate-200">
-        <div className=" dark:bg-slate-9500 p-4 lg:w-70 font-san font-normal text-5xl lg:text-15xl antialiased">
+        <div className="lg:max-[1300px]:scale-[.85] dark:bg-slate-9500 p-4 lg:max-[1300px]:p-0 lg:w-70 font-san font-normal text-5xl lg:text-15xl antialiased">
           <div>
             <Timer />
           </div>
@@ -677,9 +677,9 @@ export function PlayerOneScore() {
   const { state, dispatch } = useContext(CountdownContext);
 
   return (
-    <div className="flex flex-col-2 justify-center mt-2 lg:m-0 lg:items-between lg:justify-between  ">
+    <div className="flex flex-col-2 justify-center mt-2 lg:m-0 lg:items-between lg:justify-between">
       <div
-        className="h-1/2 lg:h-full bg-slate-300 text-center w-1/2 lg:w-[170px] rounded font-bold text-10xl lg:text-15xl text-black"
+        className="bg-slate-300 text-black h-1/2 lg:h-full text-center w-[170px] rounded font-bold text-10xl lg:text-15xl"
         onClick={() => dispatch({ type: "PLAYER_ONE_ADD_SCORE_ONE" })}
       >
         {state.playerOneScore}
@@ -720,8 +720,8 @@ export function PlayerTwoScore() {
   const [playerTwoPenaltyScore, setPlayerTwoPenaltyScore] = useState(0); */
 
   return (
-    <div className="flex flex-col-2 justify-center mt-2 lg:m-0 lg:items-between lg:justify-between ">
-      <div className="h-1/2 lg:h-full bg-red-300 text-center w-[170px] rounded font-bold text-10xl lg:text-15xl text-black"
+    <div className="flex flex-col-2 justify-center mt-2 lg:m-0 lg:items-between lg:justify-between">
+      <div className="bg-red-300 text-black h-1/2 lg:h-full text-center w-[170px] rounded font-bold text-10xl lg:text-15xl"
         onClick={() => dispatch({ type: "PLAYER_TWO_ADD_SCORE_ONE" })}>
         <p className="">{state.playerTwoScore}</p>
       </div>
@@ -828,7 +828,7 @@ export function PlayerOneControls() {
   };
 
   return (
-    <div className="text-sm size-max lg:text-xl lg:tracking-wide w-full lg:w-[700px] flex lg:flex-col-2  lg:gap-4 bg-slate-950 p-4 lg:mr-4 ">
+    <div className="text-sm size-max lg:text-xl lg:tracking-wide w-full lg:w-[700px] flex lg:flex-col-2  lg:gap-4 bg-slate-950 p-4 lg:mr-4">
       <div className="">
         <div className="text-[#8CE5BA] grid grid-rows-1 grid-flow-col gap-5">
           <button onClick={handlPlayerOneAddScoreTwo}>+2</button>
@@ -889,7 +889,7 @@ export function PlayerTwoControls() {
   };
 
   return (
-    <div className="text-sm size-max lg:text-xl lg:tracking-wide w-full lg:w-[700px] flex lg:flex-col-2  lg:gap-4 bg-slate-950 p-4 lg:mr-4 ">
+    <div className="text-sm size-max lg:text-xl lg:tracking-wide w-full lg:w-[700px] flex lg:flex-col-2  lg:gap-4 bg-slate-950 p-4 lg:mr-4">
       <div className="">
         <div className="text-[#8CE5BA] grid grid-rows-1 grid-flow-col gap-6">
           <button onClick={handlPlayerTwoAddScoreTwo}>+2</button>
@@ -915,7 +915,7 @@ export function PlayerTwoControls() {
 
 export function PlayerOne() {
   return (
-    <div className="text-xl md:flex items-start justify-between">
+    <div className="text-xl sm:flex items-start justify-between">
       <PlayerOneControls />
       <PlayerOneScore />
     </div>
@@ -924,7 +924,7 @@ export function PlayerOne() {
 
 export function PlayerTwo() {
   return (
-    <div className="text-xl md:flex items-start justify-between">
+    <div className="text-xl sm:flex items-start justify-between">
       <PlayerTwoControls />
       <PlayerTwoScore />
     </div>
@@ -989,7 +989,7 @@ export const SettingsDialog = ({
                       min={0}
                       max={30}
                       id="minutes"
-                      className="text-black"
+                      className="text-black w-full"
                       value={minutes}
                       onChange={(e) => setMinutes(parseInt(e.target.value))}
                     />
@@ -1001,7 +1001,7 @@ export const SettingsDialog = ({
                       id="seconds"
                       min={0}
                       max={59}
-                      className="text-black"
+                      className="text-black w-full"
                       value={seconds}
                       onChange={(e) => setSeconds(parseInt(e.target.value))}
                     />
