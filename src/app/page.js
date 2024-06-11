@@ -21,7 +21,7 @@ import React, {
 
 //import useState from "react-usestateref";
 
-import { Accordion, AccordionItem } from "@nextui-org/react";
+import {Accordion, AccordionItem} from "@nextui-org/accordion";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { library } from "@fortawesome/fontawesome-svg-core";
