@@ -21,12 +21,15 @@ import React, {
 
 //import useState from "react-usestateref";
 
+import { Accordion, AccordionItem } from "@nextui-org/react";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faCrown } from "@fortawesome/free-solid-svg-icons";
 import { faSliders } from "@fortawesome/free-solid-svg-icons";
 import { faArrowsRotate } from "@fortawesome/free-solid-svg-icons";
 import { faPause } from "@fortawesome/free-solid-svg-icons";
+import { faQuestion } from "@fortawesome/free-solid-svg-icons";
 
 //import bellSound from "./assets/sounds/Bell.mp3";
 const initialState = {
@@ -362,29 +365,39 @@ export default function Home() {
           </div>
         </div>
         <div className="ml-5 antialiased">
-          <ul className="list-disc whitespace-pre-wrap">
-            <p className="font-bold">HOW TO USE:</p>
-            <li>Click settings if you wish to change the timer</li>
-            <li>
-              Click start located under the timer to start or the timer itself
-            </li>
-            <li>
-              To pause the timer, click the pause button or the timer itself{" "}
-            </li>
-            <li>To reset the timer, click the reset button</li>
-            <li>
-              To end the match, in the Competitor One or Competitor Two control
-              panel click the Winner word to declare that competitor the winner.
-            </li>
-            <li>
-              If the timer ends then the app will tally the score and declare
-              the winner based on the score entered during the match.
-            </li>
-            <li>
-              If issues start to arise, please reload the page and try again!
-            </li>
-          </ul>
-          <p className="italic underline decoration-sky-500 ">
+          <Accordion variant="shadow">
+            <AccordionItem key="1" title="How To Use" aria-label="How To Use" className="font-bold bg-slate-800 rounded p-2 text-white" indicator={<FontAwesomeIcon icon={faQuestion} className="fa-solid text-white ml-1"/>} size="lg" fullWidth={false}> 
+              <ul className="list-disc whitespace-pre-wrap font-normal">
+                <li>Click settings if you wish to change the timer</li>
+                <li>
+                  Click start located under the timer to start or the timer
+                  itself
+                </li>
+                <li>
+                  To pause the timer, click the pause button or the timer itself{" "}
+                </li>
+                <li>To reset the timer, click the reset button</li>
+                <li>To add points, click the +(#) text corrosponding to the competitor, or the score 
+                  itself to add points
+                </li>
+                <li>
+                  To end the match, in the Competitor One or Competitor Two
+                  control panel click the Winner word to declare that competitor
+                  the winner.
+                </li>
+                <li>
+                  If the timer ends then the app will tally the score and
+                  declare the winner based on the score entered during the
+                  match.
+                </li>
+                <li>
+                  If issues start to arise, please reload the page and try
+                  again!
+                </li>
+              </ul>
+            </AccordionItem>
+          </Accordion>
+          <p className="italic underline decoration-sky-500 mt-2">
             Disclaimer: This is work in progress, and has a few bugs to sort out
             still before it can be fully usable.
           </p>
@@ -721,23 +734,29 @@ export function PlayerTwoScore() {
 
   return (
     <div className="flex flex-col-2 justify-center mt-2 lg:m-0 lg:items-between lg:justify-between">
-      <div className="bg-red-300 text-black h-1/2 lg:h-full text-center w-[170px] rounded font-bold text-10xl lg:text-15xl"
-        onClick={() => dispatch({ type: "PLAYER_TWO_ADD_SCORE_ONE" })}>
+      <div
+        className="bg-red-300 text-black h-1/2 lg:h-full text-center w-[170px] rounded font-bold text-10xl lg:text-15xl"
+        onClick={() => dispatch({ type: "PLAYER_TWO_ADD_SCORE_ONE" })}
+      >
         <p className="">{state.playerTwoScore}</p>
       </div>
       <div className="text-sm ml-2 text-center">
         <div className="text-[#619b7f] dark:text-[#8CE5BA] bg-slate-50 rounded p-1 dark:bg-inherit">
           Advantage
         </div>
-        <div className="text-2xl lg:text-5xl"
-          onClick={() => dispatch({ type: "PLAYER_TWO_ADD_ADVANTAGE" })}>
+        <div
+          className="text-2xl lg:text-5xl"
+          onClick={() => dispatch({ type: "PLAYER_TWO_ADD_ADVANTAGE" })}
+        >
           {state.playerTwoAdvantageScore}
         </div>
         <div className="text-red-600 bg-slate-50 rounded p-1 dark:bg-inherit">
           Penalty
         </div>
-        <div className="text-2xl lg:text-5xl mb-4 text-red-800"
-          onClick={() => dispatch({ type: "PLAYER_TWO_ADD_PENALTY" })}>
+        <div
+          className="text-2xl lg:text-5xl mb-4 text-red-800"
+          onClick={() => dispatch({ type: "PLAYER_TWO_ADD_PENALTY" })}
+        >
           {state.playerTwoPenaltyScore}
         </div>
       </div>
