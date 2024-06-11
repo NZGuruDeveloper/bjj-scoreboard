@@ -366,7 +366,7 @@ export default function Home() {
         </div>
         <div className="ml-5 antialiased">
           <Accordion variant="shadow">
-            <AccordionItem key="1" title="How To Use" aria-label="How To Use" className="font-bold bg-slate-800 rounded p-2 text-white" indicator={<FontAwesomeIcon icon={faQuestion} className="fa-solid text-white ml-1"/>} size="lg" fullWidth={false}> 
+            <AccordionItem key="1" title="How To Use?" aria-label="How To Use" className="list-disc font-bold bg-slate-900 rounded p-2 text-white w-11/12"> 
               <ul className="list-disc whitespace-pre-wrap font-normal">
                 <li>Click settings if you wish to change the timer</li>
                 <li>
