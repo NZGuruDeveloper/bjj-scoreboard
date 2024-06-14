@@ -5,22 +5,19 @@
     match with band used.
 */
 
-import React, {
-  useState,
-} from "react";
+import React, { useState } from "react";
 
-import {  CountdownProvider } from "./context/CountdownContext";
+import { CountdownProvider } from "./context/CountdownContext";
 import Timer from "./feature/timer/component/Timer";
 import SettingsDialog from "./feature/settings/component/Settings";
 import Reset from "./feature/reset/component/Reset";
 import DeclareWinner from "./feature/score/component/DeclareWinner";
 import { PlayerOne, PlayerTwo } from "./feature/score/component/Scores";
 
-import {Accordion, AccordionItem} from "@nextui-org/accordion";
+import { Accordion, AccordionItem } from "@nextui-org/accordion";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSliders } from "@fortawesome/free-solid-svg-icons";
-
 
 export default function Home() {
   const [isSettingDilagogOpen, setIsSettingDilagogOpen] = useState(false);
@@ -34,7 +31,7 @@ export default function Home() {
       <main className="min-h-screen flex flex-col items-center dark:text-slate-200">
         <div className="lg:max-[1300px]:scale-[.85] dark:bg-slate-9500 p-4 lg:max-[1300px]:p-0 lg:w-70 font-san font-normal text-5xl lg:text-15xl antialiased">
           <div>
-          <Timer />
+            <Timer />
           </div>
           <DeclareWinner />
           <div className="lg:flex lg:flex-col lg:items-start lg:justify-center text-xl lg:text-3xl dark:text-slate-400">
@@ -62,7 +59,12 @@ export default function Home() {
         </div>
         <div className="ml-5 antialiased">
           <Accordion variant="shadow">
-            <AccordionItem key="1" title="How To Use?" aria-label="How To Use" className="list-disc font-bold bg-slate-900 rounded p-2 text-white w-11/12"> 
+            <AccordionItem
+              key="1"
+              title="How To Use?"
+              aria-label="How To Use"
+              className="list-disc font-bold bg-slate-900 rounded p-2 text-white w-11/12"
+            >
               <ul className="list-disc whitespace-pre-wrap font-normal">
                 <li>Click settings if you wish to change the timer</li>
                 <li>
@@ -73,8 +75,9 @@ export default function Home() {
                   To pause the timer, click the pause button or the timer itself{" "}
                 </li>
                 <li>To reset the timer, click the reset button</li>
-                <li>To add points, click the +(#) text corrosponding to the competitor, or the score 
-                  itself to add points
+                <li>
+                  To add points, click the +(#) text corrosponding to the
+                  competitor, or the score itself to add points
                 </li>
                 <li>
                   To end the match, in the Competitor One or Competitor Two
@@ -104,4 +107,4 @@ export default function Home() {
       </main>
     </CountdownProvider>
   );
-};
+}
