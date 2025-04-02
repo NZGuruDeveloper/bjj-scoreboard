@@ -1,3 +1,4 @@
+import { stat } from "fs";
 import { createContext, useReducer } from "react";
 
 export const initialState = {
@@ -17,6 +18,7 @@ export const initialState = {
   isMatchReset: false,
   intervalId: null,
   isSettingDilagogOpen: false,
+  volume: 100,
 };
 
 export const CountdownContext = createContext(null);
@@ -268,6 +270,11 @@ export const reducer = (state, action) => {
         isSettingDilagogOpen: (state.isSettingDilagogOpen = false),
         //isMatchReset: (state.isMatchReset = true),
       };
+      case "SET_VOLUME":
+        return {
+          ...state,
+          volume: (state.volume = action.payload.volume),       
+        };
     // Reset Actions
     case "RESET_STATE":
       return {
@@ -286,6 +293,7 @@ export const reducer = (state, action) => {
         isMatchReset: false,
         intervalId: null,
         isSettingDilagogOpen: false,
+        volume:100,
       }; // initialState;
     default:
       return state;

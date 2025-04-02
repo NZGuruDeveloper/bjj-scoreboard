@@ -11,6 +11,7 @@ export default function SettingsDialog({
   const { dispatch } = useContext(CountdownContext);
   const [minutes, setMinutes] = useState(5);
   const [seconds, setSeconds] = useState(0);
+  const [volume, setVolume] = useState(100);
 
   const [isOpen, setIsOpen] = useState(true);
 
@@ -31,7 +32,7 @@ export default function SettingsDialog({
 
   const handleClose = () => {
     setIsOpen(false);
-    setIsSettingDilagogOpen(!isSettingDilagogOpen);
+    setIsSettingDilagogOpen(!isSettingDilagogOpen); 
   };
 
   return (
@@ -79,6 +80,7 @@ export default function SettingsDialog({
                       onChange={(e) => setSeconds(parseInt(e.target.value))}
                     />
                   </div>
+                  
                   <button type="submit" className="mt-4">
                     Set
                   </button>

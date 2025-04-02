@@ -15,6 +15,7 @@ export default function DeclareWinner() {
     setAudio(new Audio("/assets/sounds/Bell.mp3"));
   }, []);
   const playAudioDeclareWinner = () => {
+    //audio
     audio.play();
   };
 
